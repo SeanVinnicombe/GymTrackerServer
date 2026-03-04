@@ -1,5 +1,6 @@
 package com.github.seanv.gymtracker.entities;
 
+import com.github.seanv.gymtracker.controllers.enums.MuscleGroup;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -22,7 +23,13 @@ public class Exercise {
     private String name;
 
     @Column(name = "muscle_group")
-    private String muscleGroup;
+    @Enumerated(EnumType.STRING)
+    private MuscleGroup muscleGroup;
+
+    /**
+     * @Enumerated tells application how db should use enums as enums exists in java, but not in db so we cant use
+     * actual Enum value as db won't know what it is, that's why we use string version
+     */
 
     @ManyToMany(mappedBy = "exercises")
     private Set<ProgramDay> programDays = new HashSet<>();

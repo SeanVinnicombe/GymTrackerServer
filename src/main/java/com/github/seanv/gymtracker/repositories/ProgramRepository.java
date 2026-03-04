@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface ProgramRepository extends JpaRepository<Program, Long> {
@@ -21,4 +22,7 @@ public interface ProgramRepository extends JpaRepository<Program, Long> {
      * **/
     @EntityGraph(attributePaths = "programDays")
     Optional<Program> findById(@Param("id") Long id);
+
+    @EntityGraph(attributePaths = "programDays")
+    List<Program> getAllProgramsByUser_Id(Long userId);
 }

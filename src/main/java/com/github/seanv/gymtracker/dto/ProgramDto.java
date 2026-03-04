@@ -16,4 +16,8 @@ public class ProgramDto {
     private Integer programLength;
     private List<ProgramDayDto> programDays;
 
+    public ProgramDto(Long id){
+        this.id = id;
+    }
+
 }

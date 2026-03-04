@@ -8,6 +8,6 @@ import lombok.NoArgsConstructor;
 public class ExerciseDto {
 
     private Long id;
-    private String exerciseName;
+    private String name;
     private String muscleGroup;
 }

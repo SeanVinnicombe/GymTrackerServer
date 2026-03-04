@@ -53,4 +53,8 @@ public class Program {
     public int hashCode() {
         return Objects.hashCode(id);
     }
+
+    public Program(Long id){
+        this.id = id;
+    }
 }
