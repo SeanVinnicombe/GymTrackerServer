@@ -2,6 +2,7 @@ package com.github.seanv.gymtracker.services;
 
 import com.github.seanv.gymtracker.dto.UserDto;
 import com.github.seanv.gymtracker.entities.User;
+import com.github.seanv.gymtracker.exception.type.UserNotFoundException;
 import com.github.seanv.gymtracker.mappers.UserMapper;
 import com.github.seanv.gymtracker.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +22,6 @@ public class UserService {
     }
 
     public UserDto getUser(Long id){
-
-        return mapper.toDto(userRepository.findById(id).orElseThrow(RuntimeException::new));
+        return mapper.toDto(userRepository.findById(id).orElseThrow(() -> new UserNotFoundException(id)));
     }
 }

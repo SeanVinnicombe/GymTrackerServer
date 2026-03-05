@@ -1,9 +1,12 @@
 package com.github.seanv.gymtracker.unit.services;
 
+import com.github.seanv.gymtracker.dto.ProgramDayDto;
 import com.github.seanv.gymtracker.dto.ProgramDto;
 import com.github.seanv.gymtracker.entities.Program;
+import com.github.seanv.gymtracker.exception.type.ProgramNotFoundException;
 import com.github.seanv.gymtracker.mappers.ProgramMapper;
 import com.github.seanv.gymtracker.repositories.ProgramRepository;
+import com.github.seanv.gymtracker.services.ProgramDayService;
 import com.github.seanv.gymtracker.services.ProgramService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -13,19 +16,22 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class ProgramServiceUT {
+public class ProgramServiceUnitTest {
 
     @Mock
     private ProgramRepository programRepository;
 
     @Mock
-    ProgramMapper mapper;
+    private ProgramMapper mapper;
+
+    @Mock
+    private ProgramDayService programDayService;
 
     @InjectMocks
     private ProgramService programService;
@@ -51,6 +57,36 @@ public class ProgramServiceUT {
 
     }
 
+    @Test
+    void when_getting_program_by_id_return_valid_program_dto(){
+
+        ProgramDto dto = new ProgramDto(1L);
+        Program one = new Program(1L);
+        List<ProgramDayDto> programDaysDto = new ArrayList<>();
+
+        when(programRepository.findById(1L)).thenReturn(Optional.of(one));
+        when(mapper.toDto(one)).thenReturn(dto);
+        when(programDayService.getProgramDaysByProgramId(1L)).thenReturn(programDaysDto);
+        when(programService.getProgramDays(1L)).thenReturn(programDaysDto);
+
+        var result = programService.getProgram(1L);
+
+        assertEquals(dto, result);
+    }
+
+    @Test
+    void when_invalid_id_supplied_then_throw_correct_exception(){
+
+
+        when(programRepository.findById(999L)).thenReturn(Optional.empty());
+
+        assertThrows(ProgramNotFoundException.class, () -> programService.getProgram(999L));
+    }
+
+    @Test
+    void when_getting_all_programs_by_user_id_return_valid_list(){
+
+    }
 
 }
  /** @Mock mocks the selected class - provides a "fake" which you can use as if appl was really running

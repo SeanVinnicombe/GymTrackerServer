@@ -1,7 +1,7 @@
 package com.github.seanv.gymtracker.services;
 
 
-import com.github.seanv.gymtracker.controllers.enums.MuscleGroup;
+import com.github.seanv.gymtracker.entities.enums.MuscleGroup;
 import com.github.seanv.gymtracker.dto.ExerciseDto;
 import com.github.seanv.gymtracker.exception.type.ExerciseNotFoundException;
 import com.github.seanv.gymtracker.mappers.ExerciseMapper;
@@ -28,6 +28,6 @@ public class ExerciseService {
     }
 
     public List<ExerciseDto> getAllExercisesByMuscleGroup(MuscleGroup muscleGroup) {
-        return repository.getAllExercisesByMuscleGroup(muscleGroup).stream().map(mapper::toDto).toList();
+        return repository.findAllExercisesByMuscleGroup(muscleGroup).stream().map(mapper::toDto).toList();
     }
 }

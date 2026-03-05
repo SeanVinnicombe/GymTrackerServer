@@ -19,14 +19,17 @@ public class ProgramService {
     private final ProgramRepository programRepository;
     private final ProgramMapper mapper;
     private final ProgramDayService programDayService;
+    private final UserService userService;
 
     @Autowired
     private ProgramService(ProgramRepository programRepository,
                            ProgramMapper mapper,
-                           ProgramDayService programDayService){
+                           ProgramDayService programDayService,
+                           UserService userService){
         this.programRepository = programRepository;
         this.mapper = mapper;
         this.programDayService = programDayService;
+        this.userService = userService;
     }
 
     /**
@@ -55,11 +58,12 @@ public class ProgramService {
         return a.stream().map(mapper::toDto).toList();
     }
 
-    private List<ProgramDayDto> getProgramDays(Long programId){
+    public List<ProgramDayDto> getProgramDays(Long programId){
         return programDayService.getProgramDaysByProgramId(programId);
     }
 
     public List<ProgramDto> getAllProgramsByUserId(Long userId){
+        userService.getUser(userId);
         var list = programRepository.getAllProgramsByUser_Id(userId).stream().map(mapper::toDto).toList();
         list.forEach( i -> {
             i.setProgramDays(getProgramDays(i.getId()));

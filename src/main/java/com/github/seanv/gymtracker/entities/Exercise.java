@@ -1,6 +1,6 @@
 package com.github.seanv.gymtracker.entities;
 
-import com.github.seanv.gymtracker.controllers.enums.MuscleGroup;
+import com.github.seanv.gymtracker.entities.enums.MuscleGroup;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -50,5 +50,10 @@ public class Exercise {
     @Override
     public int hashCode() {
         return Objects.hashCode(id);
+    }
+
+    public Exercise(String name, MuscleGroup muscleGroup){
+        this.name = name;
+        this.muscleGroup = muscleGroup;
     }
 }

@@ -1,4 +1,4 @@
-package com.github.seanv.gymtracker.controllers.enums;
+package com.github.seanv.gymtracker.entities.enums;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
