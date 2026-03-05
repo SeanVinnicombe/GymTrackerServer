@@ -3,6 +3,7 @@ package com.github.seanv.gymtracker.entities;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
+import org.springframework.security.core.parameters.P;
 
 import java.util.*;
 import java.util.Set;
@@ -56,5 +57,10 @@ public class Program {
 
     public Program(Long id){
         this.id = id;
+    }
+
+    public Program(Long id, User user){
+        this.id = id;
+        this.user = user;
     }
 }

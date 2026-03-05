@@ -2,6 +2,7 @@ package com.github.seanv.gymtracker.exception.handler;
 
 import com.github.seanv.gymtracker.exception.model.ApiError;
 import com.github.seanv.gymtracker.exception.type.ExerciseNotFoundException;
+import com.github.seanv.gymtracker.exception.type.InvalidInputException;
 import com.github.seanv.gymtracker.exception.type.ProgramNotFoundException;
 import com.github.seanv.gymtracker.exception.type.UserNotFoundException;
 import org.springframework.http.HttpStatus;
@@ -23,6 +24,17 @@ public class GlobalControllerExceptionHandler {
                 HttpStatus.INTERNAL_SERVER_ERROR.value(),
                 HttpStatus.INTERNAL_SERVER_ERROR.name(),
                 "Something went wrong...",
+                LocalDateTime.now()
+        );
+    }
+
+    @ExceptionHandler(InvalidInputException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ApiError handleInvalidInput(InvalidInputException ex){
+        return new ApiError(
+                HttpStatus.BAD_REQUEST.value(),
+                HttpStatus.BAD_REQUEST.name(),
+                ex.getMessage(),
                 LocalDateTime.now()
         );
     }
