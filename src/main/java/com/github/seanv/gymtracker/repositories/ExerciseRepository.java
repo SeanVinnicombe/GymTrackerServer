@@ -9,4 +9,5 @@ import java.util.List;
 public interface ExerciseRepository extends JpaRepository<Exercise, Long> {
 
     public List<Exercise> findAllExercisesByMuscleGroup(MuscleGroup muscleGroup);
+    public Boolean existsByName(String name);
 }

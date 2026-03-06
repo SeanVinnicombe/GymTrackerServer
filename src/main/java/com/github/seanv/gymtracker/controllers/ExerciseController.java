@@ -50,10 +50,16 @@ public class ExerciseController {
 
     @Operation(description = "Creating new Exercise")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", content = @Content(mediaType = "application/json",
+            @ApiResponse(responseCode = "201", description = "Exercise successfully created", content = @Content(mediaType = "application/json",
                     schema = @Schema(implementation = ExerciseDto.class))),
-            @ApiResponse(responseCode = "400", content = @Content(mediaType = "application.json",
-                    schema = @Schema(implementation = ApiError.class)))
+            @ApiResponse(responseCode = "400", description = "Invalid input was provided", content = @Content(mediaType = "application/json",
+                    schema = @Schema(implementation = ApiError.class))),
+            @ApiResponse(responseCode = "500", description = "Something went wrong...",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ApiError.class))),
+            @ApiResponse(responseCode = "409", description = "Exercise already exists",
+            content = @Content(mediaType = "application/json",
+            schema = @Schema(implementation = ApiError.class)))
     })
     @PostMapping("/add")
     public ResponseEntity<ExerciseDto> addNewExercise(@Valid @RequestBody(

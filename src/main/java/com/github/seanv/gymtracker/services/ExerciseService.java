@@ -5,6 +5,7 @@ import com.github.seanv.gymtracker.dto.input.ExerciseInputDto;
 import com.github.seanv.gymtracker.entities.Exercise;
 import com.github.seanv.gymtracker.entities.enums.MuscleGroup;
 import com.github.seanv.gymtracker.dto.ExerciseDto;
+import com.github.seanv.gymtracker.exception.type.ExerciseExistsException;
 import com.github.seanv.gymtracker.exception.type.ExerciseNotFoundException;
 import com.github.seanv.gymtracker.mappers.ExerciseMapper;
 import com.github.seanv.gymtracker.repositories.ExerciseRepository;
@@ -34,6 +35,9 @@ public class ExerciseService {
     }
 
     public ExerciseDto addNewExercise(ExerciseInputDto dto){
+        if (repository.existsByName(dto.name())){
+            throw new ExerciseExistsException(dto.name());
+        }
         Exercise exercise = mapper.fromDto(dto);
         var result = repository.save(exercise);
         return mapper.toDto(result);

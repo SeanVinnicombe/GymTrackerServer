@@ -1,10 +1,7 @@
 package com.github.seanv.gymtracker.exception.handler;
 
 import com.github.seanv.gymtracker.exception.model.ApiError;
-import com.github.seanv.gymtracker.exception.type.ExerciseNotFoundException;
-import com.github.seanv.gymtracker.exception.type.InvalidInputException;
-import com.github.seanv.gymtracker.exception.type.ProgramNotFoundException;
-import com.github.seanv.gymtracker.exception.type.UserNotFoundException;
+import com.github.seanv.gymtracker.exception.type.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -39,7 +36,7 @@ public class GlobalControllerExceptionHandler {
         );
     }
 
-    // ==================== PROGRAM ====================
+    // ==================== USER ====================
 
     @ExceptionHandler(UserNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
@@ -75,6 +72,17 @@ public class GlobalControllerExceptionHandler {
         return new ApiError(
                 HttpStatus.NO_CONTENT.value(),
                 HttpStatus.NOT_FOUND.name(),
+                ex.getMessage(),
+                LocalDateTime.now()
+        );
+    }
+
+    @ExceptionHandler(ExerciseExistsException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ApiError handleExerciseExists(ExerciseExistsException ex){
+        return new ApiError(
+                HttpStatus.CONFLICT.value(),
+                HttpStatus.CONFLICT.name(),
                 ex.getMessage(),
                 LocalDateTime.now()
         );
