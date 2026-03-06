@@ -3,6 +3,7 @@ package com.github.seanv.gymtracker.exception.handler;
 import com.github.seanv.gymtracker.exception.model.ApiError;
 import com.github.seanv.gymtracker.exception.type.*;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -25,13 +26,13 @@ public class GlobalControllerExceptionHandler {
         );
     }
 
-    @ExceptionHandler(InvalidInputException.class)
+    @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ApiError handleInvalidInput(InvalidInputException ex){
+    public ApiError handleValidation(MethodArgumentNotValidException ex){
         return new ApiError(
                 HttpStatus.BAD_REQUEST.value(),
                 HttpStatus.BAD_REQUEST.name(),
-                ex.getMessage(),
+                "Validation failed. Invalid data entered!",
                 LocalDateTime.now()
         );
     }

@@ -1,5 +1,6 @@
 package com.github.seanv.gymtracker.unit.services;
 
+import com.github.seanv.gymtracker.dto.input.ExerciseInputDto;
 import com.github.seanv.gymtracker.entities.enums.MuscleGroup;
 import com.github.seanv.gymtracker.dto.ExerciseDto;
 import com.github.seanv.gymtracker.entities.Exercise;
@@ -51,6 +52,14 @@ public class ExerciseServiceUnitTest {
         for (ExerciseDto dto : result){
             assertEquals(MuscleGroup.CHEST.getName(),dto.getMuscleGroup());
         }
+    }
+
+    @Test
+    void when_creating_new_exercise_then_return_new_exercise(){
+
+        ExerciseInputDto input = new ExerciseInputDto("Single Arm curls", "CHEST");
+        ExerciseDto output = new ExerciseDto("Single Arm curls", "CHEST");
+
 
     }
 }

@@ -58,15 +58,16 @@ public class ExerciseController {
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = ApiError.class))),
             @ApiResponse(responseCode = "409", description = "Exercise already exists",
-            content = @Content(mediaType = "application/json",
-            schema = @Schema(implementation = ApiError.class)))
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ApiError.class))),
     })
     @PostMapping("/add")
-    public ResponseEntity<ExerciseDto> addNewExercise(@Valid @RequestBody(
-            description = "Exercise to add",
-            required = true,
-            content = @Content(schema = @Schema(implementation = ExerciseInputDto.class))
-    ) ExerciseInputDto exercise) {
+    public ResponseEntity<ExerciseDto> addNewExercise(@Valid @org.springframework.web.bind.annotation.RequestBody
+          @RequestBody(
+                  description = "Exercise to add",
+                  required = true,
+                  content = @Content(schema = @Schema(implementation = ExerciseInputDto.class))
+          ) ExerciseInputDto exercise) {
 
         var result = exerciseService.addNewExercise(exercise);
         return ResponseEntity.status(HttpStatus.CREATED).body(result);
