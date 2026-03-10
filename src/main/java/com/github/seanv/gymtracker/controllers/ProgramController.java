@@ -2,6 +2,7 @@ package com.github.seanv.gymtracker.controllers;
 
 import com.github.seanv.gymtracker.dto.ProgramDto;
 import com.github.seanv.gymtracker.dto.ProgramsResponse;
+import com.github.seanv.gymtracker.dto.input.ProgramInputDto;
 import com.github.seanv.gymtracker.exception.model.ApiError;
 import com.github.seanv.gymtracker.services.ProgramService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -11,11 +12,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 
 @RestController
@@ -63,6 +62,11 @@ public class ProgramController {
         var list =  programService.getAllPrograms();
         var response = new ProgramsResponse(list);
         return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/create")
+    public ResponseEntity<ProgramDto> createProgram(@RequestBody ProgramInputDto inputDto){
+        return ResponseEntity.status(HttpStatus.CREATED).body(programService.createProgram(inputDto));
     }
 
 

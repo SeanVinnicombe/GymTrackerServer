@@ -63,6 +63,19 @@ public class GlobalControllerExceptionHandler {
         );
     }
 
+    // ==================== PROGRAM DAY ====================
+
+    @ExceptionHandler(ProgramDayExerciseNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ApiError handleProgramDayNotFound(ProgramDayExerciseNotFoundException ex){
+        return new ApiError(
+                HttpStatus.NOT_FOUND.value(),
+                HttpStatus.NOT_FOUND.name(),
+                ex.getMessage(),
+                LocalDateTime.now()
+        );
+    }
+
 
     // ==================== EXERCISE ====================
 

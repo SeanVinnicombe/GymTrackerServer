@@ -18,13 +18,15 @@ public class Program {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @SequenceGenerator(
+            name = "program_seq_gen",
+            sequenceName = "program_seq",
+            allocationSize = 1
+    )
     private Long id;
 
-    @Column(name = "is_active")
-    private Boolean isActive;
-
-    @Column(name = "current_week")
-    private Integer currentWeek;
+    @Column(name = "name")
+    private String name;
 
     @Column(name = "program_length")
     private Integer programLength;
@@ -40,8 +42,8 @@ public class Program {
     )
     private Set<Workout> workout = new HashSet<>();
 
-    @OneToMany(mappedBy = "program")
-    private Set<ProgramDay> programDays = new HashSet<>();
+    @OneToMany(mappedBy = "program", cascade = CascadeType.ALL)
+    private List<ProgramDay> programDays = new ArrayList<>();
 
     @Override
     public boolean equals(Object o) {

@@ -24,4 +24,8 @@ public class UserService {
     public UserDto getUser(Long id){
         return mapper.toDto(userRepository.findById(id).orElseThrow(() -> new UserNotFoundException(id)));
     }
+
+    public User getUserEntity(Long id){
+        return userRepository.findById(id).orElseThrow(() -> new UserNotFoundException(id));
+    }
 }

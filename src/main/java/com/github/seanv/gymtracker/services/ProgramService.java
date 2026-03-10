@@ -1,17 +1,29 @@
 package com.github.seanv.gymtracker.services;
 
 import com.github.seanv.gymtracker.dto.ProgramDayDto;
+import com.github.seanv.gymtracker.dto.ProgramDayExerciseDto;
 import com.github.seanv.gymtracker.dto.ProgramDto;
+import com.github.seanv.gymtracker.dto.input.ProgramDayExerciseInputDto;
+import com.github.seanv.gymtracker.dto.input.ProgramDayInputDto;
+import com.github.seanv.gymtracker.dto.input.ProgramInputDto;
+import com.github.seanv.gymtracker.entities.Exercise;
 import com.github.seanv.gymtracker.entities.Program;
 import com.github.seanv.gymtracker.entities.ProgramDay;
 import com.github.seanv.gymtracker.entities.ProgramDayExercise;
 import com.github.seanv.gymtracker.exception.type.ProgramNotFoundException;
+import com.github.seanv.gymtracker.mappers.ExerciseMapper;
+import com.github.seanv.gymtracker.mappers.ProgramDayMapper;
 import com.github.seanv.gymtracker.mappers.ProgramMapper;
+import com.github.seanv.gymtracker.mappers.UserMapper;
 import com.github.seanv.gymtracker.repositories.ProgramRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class ProgramService {
@@ -20,16 +32,27 @@ public class ProgramService {
     private final ProgramMapper mapper;
     private final ProgramDayService programDayService;
     private final UserService userService;
+    private final ExerciseService exerciseService;
+    private final ExerciseMapper exerciseMapper;
+    private final UserMapper userMapper;
 
     @Autowired
-    private ProgramService(ProgramRepository programRepository,
+    public ProgramService(ProgramRepository programRepository,
                            ProgramMapper mapper,
                            ProgramDayService programDayService,
-                           UserService userService){
+                           UserService userService,
+                           ExerciseService exerciseService,
+                           ExerciseMapper exerciseMapper,
+                           UserMapper userMapper
+
+    ){
         this.programRepository = programRepository;
         this.mapper = mapper;
         this.programDayService = programDayService;
         this.userService = userService;
+        this.exerciseService = exerciseService;
+        this.exerciseMapper = exerciseMapper;
+        this.userMapper = userMapper;
     }
 
     /**
@@ -70,5 +93,43 @@ public class ProgramService {
         });
 
         return list;
+    }
+
+    @Transactional
+    public ProgramDto createProgram(ProgramInputDto inputDto){
+
+        Program program = new Program();
+        program.setUser(userService.getUserEntity(1L));
+        List<ProgramDay> programDays = new ArrayList<>();
+        program.setName(inputDto.name());
+        program.setProgramLength(inputDto.numberOfWeeks());
+        for(ProgramDayInputDto pd : inputDto.programDays()){
+            ProgramDay programDay = new ProgramDay();
+            programDay.setProgram(program);
+            programDay.setMuscleGroup(pd.muscleGroups());
+            List<ProgramDayExercise> programDayExercises = new ArrayList<>();
+            for(ProgramDayExerciseInputDto pde : pd.programDayExercises()){
+                ProgramDayExercise programDayExercise = new ProgramDayExercise();
+                programDayExercise.setProgramDay(programDay);
+                var exercise = exerciseService.getExercise(pde.exerciseId());
+                programDayExercise.setExercise(exerciseMapper.fromDto(exercise));
+                programDayExercise.setTargetReps(pde.targetReps());
+                programDayExercise.setTargetSets(pde.targetSets());
+                programDayExercises.add(programDayExercise);
+            }
+            programDay.setProgramDayExercises(programDayExercises);
+            programDays.add(programDay);
+        }
+        program.setProgramDays(programDays);
+
+        var result = mapper.toDto(programRepository.save(program));
+        result.getProgramDays().forEach(i -> {
+            int counter = 0;
+            for ( ProgramDayExerciseDto dto : i.getProgramDayExercises()){
+                dto.setExerciseNumber(++counter);
+            }
+        });
+
+        return result;
     }
 }

@@ -1,6 +1,7 @@
 package com.github.seanv.gymtracker.mappers;
 
 import com.github.seanv.gymtracker.dto.ProgramDto;
+import com.github.seanv.gymtracker.dto.input.ProgramInputDto;
 import com.github.seanv.gymtracker.entities.Program;
 import org.mapstruct.Mapper;
 
@@ -8,5 +9,5 @@ import org.mapstruct.Mapper;
 public interface ProgramMapper {
 
     ProgramDto toDto(Program program);
-    Program fromDto(ProgramDto dto);
+    Program fromInputDto(ProgramInputDto dto);
 }

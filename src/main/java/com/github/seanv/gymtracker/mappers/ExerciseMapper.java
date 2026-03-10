@@ -9,5 +9,6 @@ import org.mapstruct.Mapper;
 public interface ExerciseMapper {
 
     ExerciseDto toDto(Exercise exercise);
+    Exercise fromDto(ExerciseDto dto);
     Exercise fromDto(ExerciseInputDto dto);
 }

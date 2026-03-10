@@ -11,8 +11,6 @@ import java.util.Set;
 public class ProgramDto {
 
     private Long id;
-    private Boolean isActive;
-    private Integer currentWeek;
     private Integer programLength;
     private List<ProgramDayDto> programDays;
 

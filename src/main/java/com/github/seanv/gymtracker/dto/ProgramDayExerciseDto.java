@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ProgramDayExerciseDto {
 
+    private Integer exerciseNumber;
     private String exerciseName;
     private Integer targetSets;
     private Integer targetReps;

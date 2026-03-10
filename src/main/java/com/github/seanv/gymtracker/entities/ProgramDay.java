@@ -40,8 +40,8 @@ public class ProgramDay {
     )
     private Set<Exercise> exercises = new HashSet<>();
 
-    @OneToMany(mappedBy = "programDay")
-    private Set<ProgramDayExercise> programDayExercises;
+    @OneToMany(mappedBy = "programDay", cascade = CascadeType.ALL)
+    private List<ProgramDayExercise> programDayExercises;
 
     @Override
     public boolean equals(Object o) {

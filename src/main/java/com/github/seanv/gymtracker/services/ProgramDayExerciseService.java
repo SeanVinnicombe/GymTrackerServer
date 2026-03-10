@@ -1,14 +1,13 @@
 package com.github.seanv.gymtracker.services;
 
 import com.github.seanv.gymtracker.dto.ProgramDayExerciseDto;
-import com.github.seanv.gymtracker.entities.ProgramDayExercise;
+import com.github.seanv.gymtracker.exception.type.ProgramDayExerciseNotFoundException;
 import com.github.seanv.gymtracker.mappers.ProgramDayExerciseMapper;
 import com.github.seanv.gymtracker.repositories.ProgramDayExerciseRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class ProgramDayExerciseService {
@@ -26,5 +25,9 @@ public class ProgramDayExerciseService {
         return repository.findAllByProgramDay_Id(programDayId)
                 .stream()
                 .map(mapper::toDto).toList();
+    }
+
+    public ProgramDayExerciseDto getProgramDayExercise(Long id){
+        return mapper.toDto(repository.findById(id).orElseThrow(() -> new ProgramDayExerciseNotFoundException(id)));
     }
 }

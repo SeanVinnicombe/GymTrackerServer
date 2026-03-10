@@ -2,6 +2,7 @@ package com.github.seanv.gymtracker.services;
 
 import com.github.seanv.gymtracker.dto.ProgramDayDto;
 import com.github.seanv.gymtracker.dto.ProgramDayExerciseDto;
+import com.github.seanv.gymtracker.dto.input.ProgramDayInputDto;
 import com.github.seanv.gymtracker.entities.ProgramDay;
 import com.github.seanv.gymtracker.mappers.ProgramDayMapper;
 import com.github.seanv.gymtracker.repositories.ProgramDayExerciseRepository;
@@ -46,6 +47,13 @@ public class ProgramDayService {
 
     public List<ProgramDayExerciseDto> getProgramDayExerciseByProgramDayId(Long programDayId){
        return programDayExerciseService.getProgramDayExerciseByProgramDayId(programDayId);
+    }
+
+    public List<ProgramDayDto> saveProgramDays(List<ProgramDayInputDto> inputDtos, Long programId){
+        List<ProgramDay> list = inputDtos.stream().map(mapper::fromInputDto).toList();
+        List<ProgramDay> savedList = repository.saveAll(list);
+        return savedList.stream().map(mapper::toDto).toList();
+
     }
 
 }
