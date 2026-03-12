@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.persistence.Column;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -59,13 +60,25 @@ public class ProgramController {
     })
     @GetMapping()
     public ResponseEntity<ProgramsResponse> getAllPrograms() {
-        var list =  programService.getAllPrograms();
+        var list = programService.getAllPrograms();
         var response = new ProgramsResponse(list);
         return ResponseEntity.ok(response);
     }
 
+    @Operation(description = "Creating new Program")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Program successfully created",
+                    content = @Content(mediaType = "application.json",
+                            schema = @Schema(implementation = ProgramDto.class))),
+            @ApiResponse(responseCode = "400", description = "Invalid input was provided",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ApiError.class))),
+            @ApiResponse(responseCode = "500", description = "Something went wrong...",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ApiError.class)))
+    })
     @PostMapping("/create")
-    public ResponseEntity<ProgramDto> createProgram(@RequestBody ProgramInputDto inputDto){
+    public ResponseEntity<ProgramDto> createProgram(@RequestBody ProgramInputDto inputDto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(programService.createProgram(inputDto));
     }
 

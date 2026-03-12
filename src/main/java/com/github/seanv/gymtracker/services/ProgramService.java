@@ -122,6 +122,7 @@ public class ProgramService {
         }
         program.setProgramDays(programDays);
 
+        var a = programRepository.save(program);
         var result = mapper.toDto(programRepository.save(program));
         result.getProgramDays().forEach(i -> {
             int counter = 0;

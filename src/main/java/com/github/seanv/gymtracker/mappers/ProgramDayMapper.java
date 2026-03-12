@@ -6,7 +6,7 @@ import com.github.seanv.gymtracker.dto.input.ProgramDayInputDto;
 import com.github.seanv.gymtracker.entities.ProgramDay;
 import org.mapstruct.Mapper;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = {ProgramDayExerciseMapper.class})
 public interface ProgramDayMapper {
 
     ProgramDayDto toDto(ProgramDay programDay);

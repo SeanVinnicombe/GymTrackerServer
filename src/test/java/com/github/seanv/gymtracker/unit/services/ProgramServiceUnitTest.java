@@ -1,8 +1,11 @@
 package com.github.seanv.gymtracker.unit.services;
 
 import com.github.seanv.gymtracker.dto.ProgramDayDto;
+import com.github.seanv.gymtracker.dto.ProgramDayExerciseDto;
 import com.github.seanv.gymtracker.dto.ProgramDto;
 import com.github.seanv.gymtracker.entities.Program;
+import com.github.seanv.gymtracker.entities.ProgramDay;
+import com.github.seanv.gymtracker.entities.ProgramDayExercise;
 import com.github.seanv.gymtracker.exception.type.ProgramNotFoundException;
 import com.github.seanv.gymtracker.mappers.ProgramMapper;
 import com.github.seanv.gymtracker.repositories.ProgramRepository;
@@ -19,6 +22,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -84,7 +88,20 @@ public class ProgramServiceUnitTest {
     }
 
     @Test
-    void when_getting_all_programs_by_user_id_return_valid_list(){
+    void when_creating_program_return_saved_program(){
+
+        Program program = new Program();
+
+        ProgramDay programDay1 = new ProgramDay();
+        programDay1.setProgramDayExercises(List.of(new ProgramDayExercise(), new ProgramDayExercise()));
+        ProgramDay programDay2 = new ProgramDay();
+        programDay2.setProgramDayExercises(List.of(new ProgramDayExercise(), new ProgramDayExercise()));
+
+        program.setProgramDays(List.of(programDay1, programDay2));
+
+        when(programRepository.save(any())).thenReturn(program);
+
+        var result = programService.createProgram(program);
 
     }
 
