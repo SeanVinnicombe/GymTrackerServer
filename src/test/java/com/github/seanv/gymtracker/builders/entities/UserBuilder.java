@@ -1,7 +1,6 @@
-package com.github.seanv.gymtracker.builders;
+package com.github.seanv.gymtracker.builders.entities;
 
 import com.github.seanv.gymtracker.entities.Program;
-import com.github.seanv.gymtracker.entities.ProgramDay;
 import com.github.seanv.gymtracker.entities.User;
 
 import java.util.HashSet;

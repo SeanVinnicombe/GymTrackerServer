@@ -1,5 +1,8 @@
 package com.github.seanv.gymtracker.unit.services;
 
+import com.github.seanv.gymtracker.builders.dtos.exercise.ExerciseDtoBuilder;
+import com.github.seanv.gymtracker.builders.dtos.exercise.ExerciseInputDtoBuilder;
+import com.github.seanv.gymtracker.builders.entities.ExerciseBuilder;
 import com.github.seanv.gymtracker.dto.input.ExerciseInputDto;
 import com.github.seanv.gymtracker.entities.enums.MuscleGroup;
 import com.github.seanv.gymtracker.dto.ExerciseDto;
@@ -34,13 +37,13 @@ public class ExerciseServiceUnitTest {
     @Test
     void when_getting_exercises_by_muscle_return_valid_list(){
 
-        Exercise one = new Exercise("Bench", MuscleGroup.CHEST);
-        Exercise two = new Exercise("Flys", MuscleGroup.CHEST);
+        Exercise one = ExerciseBuilder.aExercise().build();
+        Exercise two = ExerciseBuilder.aExercise().withName("Flys").build();
         List<Exercise> list = new ArrayList<>();
         list.add(one);
         list.add(two);
-        ExerciseDto oneDto = new ExerciseDto("Bench", MuscleGroup.CHEST.getName());
-        ExerciseDto twoDto = new ExerciseDto("Flys", MuscleGroup.CHEST.getName());
+        ExerciseDto oneDto = ExerciseDtoBuilder.aExerciseDto().build();
+        ExerciseDto twoDto = ExerciseDtoBuilder.aExerciseDto().withName("Flys").build();
 
         when(exerciseRepository.findAllExercisesByMuscleGroup(MuscleGroup.CHEST)).thenReturn(list);
         when(mapper.toDto(one)).thenReturn(oneDto);
@@ -57,9 +60,28 @@ public class ExerciseServiceUnitTest {
     @Test
     void when_creating_new_exercise_then_return_new_exercise(){
 
-        ExerciseInputDto input = new ExerciseInputDto("Single Arm curls", "CHEST");
-        ExerciseDto output = new ExerciseDto("Single Arm curls", "CHEST");
+        ExerciseInputDto input = ExerciseInputDtoBuilder.aExerciseInputDto().build();
+        Exercise exercise = ExerciseBuilder
+                .aExercise()
+                .withId(50L)
+                .withName("Single arm curls")
+                .withMuscleGroup(MuscleGroup.BICEPS)
+                .build();
 
+        ExerciseDto dto = ExerciseDtoBuilder
+                .aExerciseDto()
+                .withId(50L)
+                .withName("Single arm biceps curls")
+                .withMuscleGroup(MuscleGroup.BICEPS.getName())
+                .build();
+
+        when(exerciseRepository.save(exercise)).thenReturn(exercise);
+        when(mapper.toDto(exercise)).thenReturn(dto);
+        when(mapper.fromDto(input)).thenReturn(exercise);
+
+        var result = service.addNewExercise(input);
+
+        assertEquals(result.getId(), dto.getId());
 
     }
 }

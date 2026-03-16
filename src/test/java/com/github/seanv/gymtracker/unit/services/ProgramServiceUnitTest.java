@@ -1,16 +1,16 @@
 package com.github.seanv.gymtracker.unit.services;
 
+import com.github.seanv.gymtracker.builders.dtos.program.ProgramDtoBuilder;
+import com.github.seanv.gymtracker.builders.entities.ProgramBuilder;
 import com.github.seanv.gymtracker.dto.ProgramDayDto;
-import com.github.seanv.gymtracker.dto.ProgramDayExerciseDto;
 import com.github.seanv.gymtracker.dto.ProgramDto;
 import com.github.seanv.gymtracker.entities.Program;
-import com.github.seanv.gymtracker.entities.ProgramDay;
-import com.github.seanv.gymtracker.entities.ProgramDayExercise;
 import com.github.seanv.gymtracker.exception.type.ProgramNotFoundException;
 import com.github.seanv.gymtracker.mappers.ProgramMapper;
 import com.github.seanv.gymtracker.repositories.ProgramRepository;
 import com.github.seanv.gymtracker.services.ProgramDayService;
 import com.github.seanv.gymtracker.services.ProgramService;
+import com.github.seanv.gymtracker.services.UserService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -35,6 +35,9 @@ public class ProgramServiceUnitTest {
     private ProgramMapper mapper;
 
     @Mock
+    private UserService userService;
+
+    @Mock
     private ProgramDayService programDayService;
 
     @InjectMocks
@@ -43,10 +46,10 @@ public class ProgramServiceUnitTest {
     @Test
     void return_programs_list_when_getting_all_programs(){
 
-        Program one = new Program(1L);
-        Program two = new Program(2L);
-        ProgramDto dtoOne = new ProgramDto(1L);
-        ProgramDto dtoTwo = new ProgramDto(2L);
+        Program one = ProgramBuilder.aProgram().build();
+        Program two = ProgramBuilder.aProgram().withId(2L).build();
+        ProgramDto dtoOne = ProgramDtoBuilder.aProgramDto().build();
+        ProgramDto dtoTwo = ProgramDtoBuilder.aProgramDto().withId(2L).build();
         List<Program> list = new ArrayList<>();
         list.add(one);
         list.add(two);
@@ -64,8 +67,8 @@ public class ProgramServiceUnitTest {
     @Test
     void when_getting_program_by_id_return_valid_program_dto(){
 
-        ProgramDto dto = new ProgramDto(1L);
-        Program one = new Program(1L);
+        ProgramDto dto = ProgramDtoBuilder.aProgramDto().build();
+        Program one = ProgramBuilder.aProgram().build();
         List<ProgramDayDto> programDaysDto = new ArrayList<>();
 
         when(programRepository.findById(1L)).thenReturn(Optional.of(one));
@@ -90,18 +93,17 @@ public class ProgramServiceUnitTest {
     @Test
     void when_creating_program_return_saved_program(){
 
-        Program program = new Program();
+//        ProgramDto dto = ProgramDtoBuilder.aProgramDto().build();
+//        var inputDto = ProgramInputDtoBuilder.aProgramDayInputDto().build();
+//
+//        when(programRepository.save(any())).thenReturn(dto);
+//        when(userService.getUser(inputDto.))
+//
+//        var result = programService.createProgram(inputDto);
+//
+//        assertEquals(result.getId(), dto.getId());
 
-        ProgramDay programDay1 = new ProgramDay();
-        programDay1.setProgramDayExercises(List.of(new ProgramDayExercise(), new ProgramDayExercise()));
-        ProgramDay programDay2 = new ProgramDay();
-        programDay2.setProgramDayExercises(List.of(new ProgramDayExercise(), new ProgramDayExercise()));
-
-        program.setProgramDays(List.of(programDay1, programDay2));
-
-        when(programRepository.save(any())).thenReturn(program);
-
-        var result = programService.createProgram(program);
+        //TODO Come back and finish when user sessions have been implemented with Spring security
 
     }
 

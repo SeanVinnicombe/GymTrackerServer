@@ -1,20 +1,16 @@
-package com.github.seanv.gymtracker.builders;
+package com.github.seanv.gymtracker.builders.entities;
 
-import com.github.seanv.gymtracker.entities.Exercise;
-import com.github.seanv.gymtracker.entities.Program;
 import com.github.seanv.gymtracker.entities.ProgramDay;
 import com.github.seanv.gymtracker.entities.ProgramDayExercise;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 public class ProgramDayBuilder {
 
     private String muscleGroup = "CHEST";
-    private Program program = ProgramBuilder.aProgram().build();
     private List<ProgramDayExercise> programDayExercises = new ArrayList<>();
+    private int programDayExercisesCount = 6;
 
 
     public static ProgramDayBuilder aProgramDay() {
@@ -22,11 +18,7 @@ public class ProgramDayBuilder {
     }
 
     public ProgramDayBuilder withProgramDayExercises(int count){
-
-        for (int i = 0; i < count ;i++){
-            programDayExercises.add(ProgramDayExerciseBuilder.aProgramDayExerciseBuilder().build());
-        }
-
+        this.programDayExercisesCount = count;
         return this;
     }
 
@@ -34,7 +26,9 @@ public class ProgramDayBuilder {
         ProgramDay programDay = new ProgramDay();
 
         programDay.setMuscleGroup(muscleGroup);
-        programDay.setProgram(program);
+        for (int i = 0; i < programDayExercisesCount ;i++){
+            programDayExercises.add(ProgramDayExerciseBuilder.aProgramDayExerciseBuilder().build());
+        }
         programDay.setProgramDayExercises(programDayExercises);
 
         return programDay;
