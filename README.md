@@ -32,6 +32,7 @@ more production ready features and implementations
 - DTO + mapper pattern
 - Global Exception handling
 - Foundation test coverage for Services and Controller
+- Test Builders for testing
 
 
 ## To Still be implemented
