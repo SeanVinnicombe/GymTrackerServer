@@ -20,12 +20,6 @@ public class ExerciseSession {
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
 
-    @Column(name = "target_reps")
-    private Integer targetReps;
-
-    @Column(name = "target_sets")
-    private Integer targetSets;
-
     @Column(name = "notes")
     private String notes;
 

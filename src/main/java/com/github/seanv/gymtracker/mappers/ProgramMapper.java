@@ -9,7 +9,7 @@ import org.mapstruct.Mapper;
  mappers which might miss the mappings you want
  */
 @Mapper(componentModel = "spring",
-uses = {ProgramDayMapper.class})
+uses = {ProgramWeekMapper.class})
 public interface ProgramMapper {
 
     ProgramDto toDto(Program program);

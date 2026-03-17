@@ -9,6 +9,6 @@ import java.util.List;
 @Repository
 public interface ProgramDayRepository extends JpaRepository<ProgramDay, Long> {
 
-    List<ProgramDay> findAllByProgram_Id(Long programId);
+    List<ProgramDay> findAllByProgramWeek_Id(Long programWeekId);
 
 }

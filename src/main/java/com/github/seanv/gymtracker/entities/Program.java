@@ -36,14 +36,8 @@ public class Program {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @OneToMany(mappedBy = "program",
-               cascade = CascadeType.ALL,
-               orphanRemoval = true
-    )
-    private Set<Workout> workout = new HashSet<>();
-
     @OneToMany(mappedBy = "program", cascade = CascadeType.ALL)
-    private List<ProgramDay> programDays = new ArrayList<>();
+    private List<ProgramWeek> programWeeks = new ArrayList<>();
 
     @Override
     public boolean equals(Object o) {

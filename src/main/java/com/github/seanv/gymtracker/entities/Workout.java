@@ -20,11 +20,6 @@ public class Workout {
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "program_id", nullable = false)
-    @NotNull
-    private Program program;
-
     @OneToMany(mappedBy = "workout",
             cascade = CascadeType.ALL,
             orphanRemoval = true)

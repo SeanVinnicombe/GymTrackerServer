@@ -32,9 +32,9 @@ public class ProgramDayService {
     /** Set is expected, but due to hashing, result has items in random order, so it is converted first to list
         and then Comparator class is used to compare the Ids of the Class type "ProgramDayDTO" class
      **/
-    public List<ProgramDayDto> getProgramDaysByProgramId(Long programId){
+    public List<ProgramDayDto> getProgramDaysByProgramId(Long programWeekId){
 
-        var list = repository.findAllByProgram_Id(programId)
+        var list = repository.findAllByProgramWeek_Id(programWeekId)
                 .stream()
                 .map(mapper::toDto).distinct().collect(Collectors.toCollection(ArrayList::new));
 

@@ -25,9 +25,9 @@ public class ProgramDay {
     private String muscleGroup;
 
     @ManyToOne
-    @JoinColumn(name = "program_id", nullable = false)
+    @JoinColumn(name = "program_week_id", nullable = false)
     @NotNull
-    private Program program;
+    private ProgramWeek programWeek;
 
     @OneToMany(mappedBy = "programDay")
     private Set<Workout> workouts = new HashSet<>();

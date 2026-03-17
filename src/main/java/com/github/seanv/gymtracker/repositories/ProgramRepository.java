@@ -11,10 +11,10 @@ import java.util.Optional;
 
 public interface ProgramRepository extends JpaRepository<Program, Long> {
 
-    @Query("SELECT p FROM Program p " +
-            "join fetch p.programDays "
-            )
-    Optional<Program> findByIdWithProgramDays(@Param("id") Long id);
+//    @Query("SELECT p FROM Program p " +
+//            "join fetch p.programDays "
+//            )
+//    Optional<Program> findByIdWithProgramDays(@Param("id") Long id);
 
     /**
      * Entity graph is used to reduce boilerplate and automatically assigning join fetch to query, which

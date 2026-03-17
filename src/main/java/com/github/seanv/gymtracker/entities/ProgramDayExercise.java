@@ -18,6 +18,9 @@ public class ProgramDayExercise {
     @GeneratedValue
     private Long id;
 
+    @Column(name = "exercise_number")
+    private Integer exerciseNumber;
+
     @Column(name = "target_reps")
     private Integer targetReps;
 
