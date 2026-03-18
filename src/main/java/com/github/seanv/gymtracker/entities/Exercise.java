@@ -34,9 +34,6 @@ public class Exercise {
     @ManyToMany(mappedBy = "exercises")
     private Set<ProgramDay> programDays = new HashSet<>();
 
-    @OneToMany(mappedBy = "exercise", cascade = CascadeType.ALL)
-    private List<ExerciseSession> exerciseSession = new ArrayList<>();
-
     @OneToMany(mappedBy = "exercise")
     private List<ProgramDayExercise> programDayExercise;
 

@@ -29,9 +29,6 @@ public class ProgramDay {
     @NotNull
     private ProgramWeek programWeek;
 
-    @OneToMany(mappedBy = "programDay")
-    private Set<Workout> workouts = new HashSet<>();
-
     @ManyToMany
     @JoinTable(
             name = "program_day_exercise",

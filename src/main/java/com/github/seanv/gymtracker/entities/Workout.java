@@ -20,16 +20,6 @@ public class Workout {
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
 
-    @OneToMany(mappedBy = "workout",
-            cascade = CascadeType.ALL,
-            orphanRemoval = true)
-    private Set<ExerciseSession> exerciseSessions = new HashSet<>();
-
-    @ManyToOne
-    @JoinColumn(name = "program_day_id", nullable = false)
-    @NotNull
-    private ProgramDay programDay;
-
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;

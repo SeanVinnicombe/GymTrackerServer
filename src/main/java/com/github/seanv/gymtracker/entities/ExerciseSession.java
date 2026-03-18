@@ -23,18 +23,12 @@ public class ExerciseSession {
     @Column(name = "notes")
     private String notes;
 
-    @ManyToOne
-    @JoinColumn(name = "exercise_id", nullable = false)
-    @NotNull
-    private Exercise exercise;
-
-    @ManyToOne
-    @JoinColumn(name = "workout_id", nullable = false)
-    @NotNull
-    private Workout workout;
-
     @OneToMany(mappedBy = "exerciseSession")
     private List<Set> sets = new ArrayList<>();
+
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "program_day_exercise_id")
+    private ProgramDayExercise programDayExercise ;
 
     @Override
     public boolean equals(Object o) {

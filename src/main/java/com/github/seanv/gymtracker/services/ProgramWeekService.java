@@ -1,11 +1,13 @@
 package com.github.seanv.gymtracker.services;
 
 import com.github.seanv.gymtracker.dto.ProgramWeekDto;
+import com.github.seanv.gymtracker.entities.ProgramDayExercise;
 import com.github.seanv.gymtracker.mappers.ProgramWeekMapper;
 import com.github.seanv.gymtracker.repositories.ProgramWeekRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -23,6 +25,12 @@ public class ProgramWeekService {
     public ProgramWeekDto getProgramWeek(Long programId, Integer weekNumber){
 
         var result = repository.findByProgram_IdAndWeekNumber(programId, weekNumber);
+        result.getProgramDays().forEach(
+                i -> i.setProgramDayExercises(i.getProgramDayExercises()
+                        .stream()
+                        .sorted(Comparator.comparing(ProgramDayExercise::getExerciseNumber))
+                        .toList())
+        );
         return mapper.toDto(result);
     }
 

@@ -5,7 +5,7 @@ import com.github.seanv.gymtracker.entities.ProgramDayExercise;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = ExerciseSessionMapper.class)
 public interface ProgramDayExerciseMapper {
 
     @Mapping(source = "exercise.name", target = "exerciseName")

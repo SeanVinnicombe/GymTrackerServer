@@ -37,6 +37,9 @@ public class ProgramDayExercise {
     @NotNull
     private Exercise exercise;
 
+    @OneToOne(mappedBy = "programDayExercise")
+    private ExerciseSession exerciseSession;
+
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;

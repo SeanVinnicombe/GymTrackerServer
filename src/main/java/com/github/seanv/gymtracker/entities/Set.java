@@ -19,6 +19,9 @@ public class Set {
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
 
+    @Column(name = "set_order")
+    private Integer setOrder;
+
     @Column(name = "achieved_resp")
     private Integer achievedReps;
 

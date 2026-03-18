@@ -7,15 +7,14 @@ import lombok.Setter;
 
 import java.util.List;
 
-
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class ProgramWeekDto {
+public class ExerciseSessionDto {
 
     private Long id;
-    private Long programId;
-    private Integer weekNumber;
-    private List<ProgramDayDto> programDays;
+    private List<SetDto> sets;
+    private String notes;
+
 }

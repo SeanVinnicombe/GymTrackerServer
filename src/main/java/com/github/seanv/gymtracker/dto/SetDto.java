@@ -1,21 +1,19 @@
 package com.github.seanv.gymtracker.dto;
 
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.List;
-
-
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class ProgramWeekDto {
+public class SetDto {
 
     private Long id;
-    private Long programId;
-    private Integer weekNumber;
-    private List<ProgramDayDto> programDays;
+    private Integer setOrder;
+    private Integer weightDone;
+    private Integer achievedReps;
 }
