@@ -22,7 +22,7 @@ public class Set {
     @Column(name = "set_order")
     private Integer setOrder;
 
-    @Column(name = "achieved_resp")
+    @Column(name = "achieved_reps")
     private Integer achievedReps;
 
     @Column(name = "weight_done")

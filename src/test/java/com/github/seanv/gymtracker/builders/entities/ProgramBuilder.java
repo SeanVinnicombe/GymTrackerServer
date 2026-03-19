@@ -2,6 +2,7 @@ package com.github.seanv.gymtracker.builders.entities;
 
 import com.github.seanv.gymtracker.entities.Program;
 import com.github.seanv.gymtracker.entities.ProgramDay;
+import com.github.seanv.gymtracker.entities.ProgramWeek;
 import com.github.seanv.gymtracker.entities.User;
 
 import java.util.ArrayList;
@@ -13,15 +14,15 @@ public class ProgramBuilder {
     private String name = "Strength";
     private Integer programLength = 8;
     private User user = UserBuilder.aProgram().build();
-    private List<ProgramDay> programDays = new ArrayList<>();
-    private int programDaysCount = 5;
+    private List<ProgramWeek> programWeeks = new ArrayList<>();
+    private int programWeeksCount = 5;
 
     public static ProgramBuilder aProgram(){
         return new ProgramBuilder();
     }
 
-    public ProgramBuilder withProgramDays(int count){
-        this.programDaysCount = count;
+    public ProgramBuilder withProgramWeeks(int count){
+        this.programWeeksCount = count;
          return this;
     }
 
@@ -36,10 +37,10 @@ public class ProgramBuilder {
         program.setId(id);
         program.setName(name);
         program.setUser(user);
-        for (int i = 0; i < programDaysCount; i++){
-            programDays.add(ProgramDayBuilder.aProgramDay().build());
+        for (int i = 0; i < programWeeksCount; i++){
+            programWeeks.add(ProgramWeekBuilder.aProgramWeekBuilder().build());
         }
-        program.setProgramDays(programDays);
+        program.setProgramWeeks(programWeeks);
         program.setProgramLength(programLength);
 
         return program;

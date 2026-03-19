@@ -8,6 +8,7 @@ public class ProgramDayExercisesInputDtoBuilder {
     private Integer targetSets = 3;
     private Integer targerReps = 6;
 
+
     public static ProgramDayExercisesInputDtoBuilder aProgramDayExercisesInputDto(){
         return new ProgramDayExercisesInputDtoBuilder();
     }
