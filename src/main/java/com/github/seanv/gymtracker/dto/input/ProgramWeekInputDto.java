@@ -1,5 +1,6 @@
 package com.github.seanv.gymtracker.dto.input;
 
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 
 import java.util.List;

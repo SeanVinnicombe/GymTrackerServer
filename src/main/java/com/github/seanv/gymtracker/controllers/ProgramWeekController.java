@@ -2,6 +2,7 @@ package com.github.seanv.gymtracker.controllers;
 
 import com.github.seanv.gymtracker.dto.ProgramWeekDto;
 import com.github.seanv.gymtracker.dto.input.ProgramWeekInputDto;
+import com.github.seanv.gymtracker.dto.update.ProgramWeekUpdateDto;
 import com.github.seanv.gymtracker.exception.model.ApiError;
 import com.github.seanv.gymtracker.services.ProgramWeekService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -12,6 +13,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -39,7 +41,7 @@ public class ProgramWeekController {
     public ResponseEntity<ProgramWeekDto> getProgramWeek(@PathVariable("programId") Long programId,
                                                          @PathVariable("weekNumber") Integer weekNumber) {
 
-        return ResponseEntity.ok(service.getProgramWeek(programId, weekNumber));
+        return ResponseEntity.status(HttpStatus.FOUND).body(service.getProgramWeek(programId, weekNumber));
     }
 
     @ApiResponses(value = {
@@ -50,10 +52,13 @@ public class ProgramWeekController {
             @ApiResponse(responseCode = "500", description = "Something went wrong...", content = @Content(mediaType = "application.json", schema = @Schema(implementation = ApiError.class)))
     })
     @Operation(description = "Request responsible for updating specific program week")
-    @PostMapping
-    public ResponseEntity<ProgramWeekDto> updateProgramWeek(@RequestBody @Valid ProgramWeekInputDto inputDto) {
+    @PutMapping("{programWeekId}/log")
+    public ResponseEntity<ProgramWeekDto> updateProgramWeek(
+            @PathVariable("programWeekId") Long programWeekId,
+            @RequestBody @Valid ProgramWeekUpdateDto updateDto)
+    {
 
-        return null;
+        return ResponseEntity.status(HttpStatus.CREATED).body(service.updateProgramWeek(programWeekId, updateDto));
 
     }
 

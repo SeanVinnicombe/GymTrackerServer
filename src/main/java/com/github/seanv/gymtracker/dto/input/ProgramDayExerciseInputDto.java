@@ -5,8 +5,9 @@ import org.springframework.data.relational.core.sql.In;
 
 public record ProgramDayExerciseInputDto(
         @NotNull Long exerciseId,
+        @NotNull Integer exerciseNumber,
         @NotNull Integer targetSets,
         @NotNull Integer targetReps,
-        @NotNull ExerciseSessionInputDto exerciseSession
+        ExerciseSessionInputDto exerciseSession
         ) {
 }

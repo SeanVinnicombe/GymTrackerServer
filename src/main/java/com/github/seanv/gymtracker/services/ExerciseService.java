@@ -30,6 +30,10 @@ public class ExerciseService {
         return mapper.toDto(repository.findById(id).orElseThrow(() -> new ExerciseNotFoundException(id)));
     }
 
+    public Exercise getExerciseEntity(Long id){
+        return repository.findById(id).orElseThrow(() -> new ExerciseNotFoundException(id));
+    }
+
     public List<ExerciseDto> getAllExercisesByMuscleGroup(MuscleGroup muscleGroup) {
         return repository.findAllExercisesByMuscleGroup(muscleGroup).stream().map(mapper::toDto).toList();
     }

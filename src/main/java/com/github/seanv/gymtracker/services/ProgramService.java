@@ -138,9 +138,6 @@ public class ProgramService {
         }
         program.setProgramWeeks(programWeeks);
 
-        var a = programRepository.save(program);
-        var result = mapper.toDto(programRepository.save(program));
-
-        return result;
+        return mapper.toDto(programRepository.save(program));
     }
 }

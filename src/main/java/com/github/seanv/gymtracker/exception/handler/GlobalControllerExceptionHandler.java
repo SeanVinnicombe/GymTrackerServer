@@ -63,6 +63,19 @@ public class GlobalControllerExceptionHandler {
         );
     }
 
+    // ==================== PROGRAM WEEK ====================
+
+    @ExceptionHandler(ProgramWeekNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ApiError handleProgramWeekNotFound(ProgramWeekNotFoundException ex){
+        return new ApiError(
+                HttpStatus.NOT_FOUND.value(),
+                HttpStatus.NOT_FOUND.name(),
+                ex.getMessage(),
+                LocalDateTime.now()
+        );
+    }
+
     // ==================== PROGRAM DAY ====================
 
     @ExceptionHandler(ProgramDayExerciseNotFoundException.class)
@@ -97,6 +110,20 @@ public class GlobalControllerExceptionHandler {
         return new ApiError(
                 HttpStatus.CONFLICT.value(),
                 HttpStatus.CONFLICT.name(),
+                ex.getMessage(),
+                LocalDateTime.now()
+        );
+    }
+
+    // ==================== EXERCISE SESSION ====================
+
+    @ExceptionHandler(ExerciseSessionNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ApiError handleExerciseSessionNotFoundException(ExerciseSessionNotFoundException ex){
+
+        return new ApiError(
+                HttpStatus.NOT_FOUND.value(),
+                HttpStatus.NOT_FOUND.name(),
                 ex.getMessage(),
                 LocalDateTime.now()
         );
