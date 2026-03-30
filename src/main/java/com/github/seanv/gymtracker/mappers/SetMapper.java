@@ -1,6 +1,7 @@
 package com.github.seanv.gymtracker.mappers;
 
 import com.github.seanv.gymtracker.dto.SetDto;
+import com.github.seanv.gymtracker.dto.update.SetUpdateDto;
 import com.github.seanv.gymtracker.entities.Set;
 import org.mapstruct.Mapper;
 
@@ -8,4 +9,5 @@ import org.mapstruct.Mapper;
 public interface SetMapper {
 
     SetDto toDto(Set set);
+    Set fromUpdateDto(SetUpdateDto dto);
 }

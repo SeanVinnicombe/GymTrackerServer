@@ -11,11 +11,11 @@ import org.mapstruct.Mapping;
 uses = {ProgramDayMapper.class})
 public interface ProgramWeekMapper {
 
-    ProgramWeek fromDto(ProgramWeekDto dto);
+//    ProgramWeek fromDto(ProgramWeekDto dto);
 
     ProgramWeek fromDto(ProgramWeekInputDto dto);
 
-    ProgramWeek fromDto(ProgramWeekUpdateDto dto);
+//    ProgramWeek fromUpdateDto(ProgramWeekUpdateDto dto);
 
     @Mapping(target = "programId", source = "program.id")
     ProgramWeekDto toDto(ProgramWeek programWeek);

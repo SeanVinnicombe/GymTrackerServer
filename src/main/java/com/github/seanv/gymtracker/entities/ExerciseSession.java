@@ -17,16 +17,24 @@ import java.util.Objects;
 public class ExerciseSession {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "exercise_session_seq")
+    @SequenceGenerator(
+            name = "exercise_session_seq",
+            sequenceName = "exercise_session_seq",
+            allocationSize = 1
+    )
     private Long id;
 
     @Column(name = "notes")
     private String notes;
 
-    @OneToMany(mappedBy = "exerciseSession")
+    @OneToMany(mappedBy = "exerciseSession", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Set> sets = new ArrayList<>();
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @Column (name = "week_number")
+    private Integer weekNumber;
+
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "program_day_exercise_id")
     private ProgramDayExercise programDayExercise ;
 

@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
+import java.util.List;
 import java.util.Objects;
 
 @Getter
@@ -15,7 +16,12 @@ import java.util.Objects;
 public class ProgramDayExercise {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "program_day_exercise_seq")
+    @SequenceGenerator(
+            name = "program_day_exercise_seq",
+            sequenceName = "program_day_exercise_seq",
+            allocationSize = 1
+    )
     private Long id;
 
     @Column(name = "exercise_number")
@@ -37,8 +43,8 @@ public class ProgramDayExercise {
     @NotNull
     private Exercise exercise;
 
-    @OneToOne(mappedBy = "programDayExercise")
-    private ExerciseSession exerciseSession;
+    @OneToMany(mappedBy = "programDayExercise", cascade = CascadeType.ALL)
+    private List<ExerciseSession> exerciseSession;
 
     @Override
     public boolean equals(Object o) {

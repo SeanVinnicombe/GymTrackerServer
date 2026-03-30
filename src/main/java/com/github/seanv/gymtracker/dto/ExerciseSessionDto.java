@@ -16,5 +16,6 @@ public class ExerciseSessionDto {
     private Long id;
     private List<SetDto> sets;
     private String notes;
+    private Integer weekNumber;
 
 }

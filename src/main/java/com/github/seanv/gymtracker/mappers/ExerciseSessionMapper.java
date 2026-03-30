@@ -1,6 +1,7 @@
 package com.github.seanv.gymtracker.mappers;
 
 import com.github.seanv.gymtracker.dto.ExerciseSessionDto;
+import com.github.seanv.gymtracker.dto.update.ExerciseSessionUpdateDto;
 import com.github.seanv.gymtracker.entities.ExerciseSession;
 import org.mapstruct.Mapper;
 
@@ -8,4 +9,5 @@ import org.mapstruct.Mapper;
 public interface ExerciseSessionMapper {
 
     ExerciseSessionDto toDto(ExerciseSession exerciseSession);
+    ExerciseSession fromUpdateDto(ExerciseSessionUpdateDto dto);
 }

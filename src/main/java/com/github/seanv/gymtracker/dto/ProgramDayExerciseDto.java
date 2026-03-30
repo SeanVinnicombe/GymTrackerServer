@@ -4,6 +4,8 @@ import com.github.seanv.gymtracker.entities.Exercise;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @NoArgsConstructor
 public class ProgramDayExerciseDto {
@@ -12,5 +14,5 @@ public class ProgramDayExerciseDto {
     private String exerciseName;
     private Integer targetSets;
     private Integer targetReps;
-    private ExerciseSessionDto exerciseSession;
+    private List<ExerciseSessionDto> exerciseSession;
 }

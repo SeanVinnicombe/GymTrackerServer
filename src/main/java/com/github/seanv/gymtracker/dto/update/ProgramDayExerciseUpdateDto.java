@@ -1,4 +1,6 @@
 package com.github.seanv.gymtracker.dto.update;
 
-public record ProgramDayExerciseUpdateDto(ExerciseSessionUpdateDto exerciseSession) {
+import java.util.List;
+
+public record ProgramDayExerciseUpdateDto(Long programDayExerciseId, ExerciseSessionUpdateDto exerciseSession) {
 }

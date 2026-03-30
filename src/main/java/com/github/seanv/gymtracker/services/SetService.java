@@ -6,6 +6,7 @@ import com.github.seanv.gymtracker.mappers.SetMapper;
 import com.github.seanv.gymtracker.repositories.SetRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class SetService {
@@ -19,7 +20,13 @@ public class SetService {
         this.mapper = mapper;
     }
 
+
     public SetDto getSet(Long id){
         return mapper.toDto(repository.findById(id).orElse(null));
     }
+
+//    public void deleteByExerciseSession(Long exerciseSessionId){
+//        repository.deleteAllByExerciseSession_Id(exerciseSessionId);
+//        repository.flush();
+//    }
 }

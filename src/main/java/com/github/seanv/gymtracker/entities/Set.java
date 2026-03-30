@@ -16,7 +16,12 @@ import java.util.Objects;
 public class Set {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "set_seq")
+    @SequenceGenerator(
+            name = "set_seq",
+            sequenceName = "set_seq",
+            allocationSize = 1
+    )
     private Long id;
 
     @Column(name = "set_order")

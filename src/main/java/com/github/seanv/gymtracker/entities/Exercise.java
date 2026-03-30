@@ -16,7 +16,12 @@ import java.util.Set;
 public class Exercise {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "exercise_seq")
+    @SequenceGenerator(
+            name = "exercise_seq",
+            sequenceName = "exercise_seq",
+            allocationSize = 1
+    )
     private Long id;
 
     @Column(name = "name")
