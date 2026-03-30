@@ -5,7 +5,7 @@ A gym tracking app which allows users to create and log workouts for gym progres
 
 ## Project Status
 
-This is currently an MVP(10-12 hours currently) to first focus on building correct structures and validating endpoints to ensure flow of data 
+This is currently an MVP(15-20 hours currently) to first focus on building correct structures and validating endpoints to ensure flow of data 
 is working correctly and the setup of project was done correctly and according to industry standard before moving onto
 more production ready features and implementations
 
