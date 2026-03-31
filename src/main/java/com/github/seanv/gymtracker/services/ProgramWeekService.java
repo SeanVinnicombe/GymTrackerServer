@@ -126,10 +126,16 @@ public class ProgramWeekService {
         List<ExerciseSession> sessions = programDayExercise.getExerciseSession();
 
         if (inputDto.exerciseSession() != null){
-            sessions.removeIf(es -> es.getWeekNumber() == weekNumber);
+            ExerciseSession es = sessions.stream().filter( i -> i.getWeekNumber()
+                    .equals(weekNumber))
+                    .findFirst()
+                    .orElse(null);
+
+            if (es != null){
+                programDayExercise.removeExerciseSession(es);
+            }
             ExerciseSession exerciseSession = convertToExerciseSession(inputDto.exerciseSession(), programDayExercise);
-            sessions.add(exerciseSession);
-            programDayExercise.setExerciseSession(sessions);
+            programDayExercise.addExerciseSession(exerciseSession);
         }
 
         return programDayExercise;
