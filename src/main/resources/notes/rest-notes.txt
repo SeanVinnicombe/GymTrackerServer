@@ -1,0 +1,59 @@
+REST
+---------------------------
+
+REST is stateless, this means it doesn't store any memory or has any recollection of any request you
+did before except the current one. This is why it's important to pass everything the server will need, with the request
+as you cant tell REST "Use something I gave you 5min ago"
+
+That's why it's best to use JWT tokens, as they store all information with them, and don't leave anything up to
+REST or Server to remember as when using sessions for example.
+
+
+What are sessions?
+---------------------------
+
+Before everytime you wanted to make a request, you would need to verify so that you could make the request, even if
+you literally made request call and got verified 10 seconds ago - very frustrating
+
+Sessions were the original solution to this problem. When you logged in successfully into the server:
+
+1.Server creates a spot in memory(the session) with the user data stored inside this spot.
+
+2.You are then provided with a session Id (random string value '123abc') as a cookie
+
+3.Every future request you make then includes that cookie(session Id)
+
+4. Server then looks into session store to see if '123abc' s present, if it is it then gathers your user data from it
+and then server knows who you are
+
+Problem using sessions with Rest:
+
+REST is stateless, therefore it doesn't store any data and so you are making the server store the session data.
+Other problems include:
+
+1. If you have 2 instances of server running, instance A has your session,
+ but instance B doesn't - some requests will then fail
+
+2. If the server restarts, all sessions are lost
+
+3.It doesnt scale cleanly
+
+
+Why JWT is the golden egg
+-----------------------------
+
+JWT uses a token. When you log into the server, it creates a token using your user details(id, roles, etc.),
+ signs the token using secret key and then sends it to you. Every future request then uses this token
+ which the server the uses to verify by checking that signature is valid and then reads data directly from token
+ you and therefore this means server doesn't store any data like with session. Server recieves token via request,
+ does it's checks and then continues
+
+JWT vs Sessions
+------------------------------
+
+Think of ordering from waiter vs at the counter at restaurant.
+
+Sessions - > The server is the waiter, remembers you via session store. That is stateful
+
+JWT -> Every request carries the token which contains your information. Server does not require any memory
+of previous requests. That is stateless. That is why server can scale horizontally across many server instances

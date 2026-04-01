@@ -1,0 +1,27 @@
+
+
+Threads (Real world example)
+------------------------------
+
+Think of server like restaurant kitchen. whe order comes in, a chef picks up order and handles it start to finish.
+
+If ten orders come in simultaneously , ten chefs then handle the ten orders in parallel. Each chef has own workbench
+- that's their stack, where local variables live. They don't share workbenches.
+
+But, there is a shared fridge that all the chefs can use, this is the Heap, where objects like singletons beans live.
+All chefs can reach into fridge at the same time, which is why mutable shared state ( weekNumber in ProgramWeekService )
+is bad idea.
+
+Now - for Security, we have something known as Security Context. Spring uses something know as ThreadLocal to store
+theSecurityContext. A Thread Local is like giving each chef a personal safe pocket, that only they can access.
+Chef A has User A identity and Chef B has User B identity. They are completely isolated,
+even though they are in the same kitchen
+
+Therefore, Spring reaches into each threads own personal safe pocket to get that requests authenticated user.
+No sharing and no confusion between users
+
+
+
+
+
+

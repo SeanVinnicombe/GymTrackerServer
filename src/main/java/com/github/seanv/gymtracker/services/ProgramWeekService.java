@@ -24,7 +24,24 @@ public class ProgramWeekService {
     private final ProgramWeekRepository repository;
     private final ProgramWeekMapper mapper;
     private final ExerciseSessionService exerciseSessionService;
-    private int weekNumber = 0;
+    //private int weekNumber;
+
+    /**
+     * For weekNumber, remember Spring beans are singleton so the state is shared across application and so if  you
+     * have global variable that has a certain value and 2 threads ( 2 users accessing method at same time)
+     * that use class, they both use variable and the one might be on different week which can then cause
+     * issue.
+     *
+     * Remember each method call gets its own stack frame for its local variables and that's why it's better to use it
+     * as a local variable and pass it that way instead of instance(global) variable which is shared via the whole
+     * class.
+     *
+     * Instance variables -> live on heap, shared across all threads
+     * Local variables -> Belong to the stack, private to that specific method - threads don't get confused
+     *
+     *
+     * Singleton bean + mutable instance field + concurrent requests = a race condition - not good
+     */
 
     @Autowired
     public ProgramWeekService(ProgramWeekRepository repository,
@@ -60,7 +77,6 @@ public class ProgramWeekService {
                         () -> new ProgramWeekNotFoundException(programWeekId)
                 );
 
-        weekNumber = inputDto.weekNumber();
         Map<Long, ProgramDay> dayMap = programWeek.getProgramDays()
                 .stream()
                 .collect(Collectors.toMap(ProgramDay::getId, Function.identity()));
@@ -68,7 +84,7 @@ public class ProgramWeekService {
 
         for (ProgramDayUpdateDto pdDto : inputDto.programDays()){
             ProgramDay programDay = dayMap.get(pdDto.programDayId());
-            ProgramDay result = convertToProgramDay(pdDto, programDay);
+            ProgramDay result = convertToProgramDay(pdDto, programDay,inputDto.weekNumber());
             programDays.add(result);
         }
 
@@ -98,9 +114,8 @@ public class ProgramWeekService {
      * Therefore, DB stays insync
      */
 
-    public ProgramDay convertToProgramDay(ProgramDayUpdateDto inputDto, ProgramDay programDay){
+    public ProgramDay convertToProgramDay(ProgramDayUpdateDto inputDto, ProgramDay programDay, int weekNumber){
 
-        programDay.setMuscleGroup(programDay.getMuscleGroup());
         Map<Long, ProgramDayExercise> programDayExerciseMap = programDay.getProgramDayExercises()
                 .stream()
                 .collect(Collectors.toMap(ProgramDayExercise::getId, Function.identity()));
@@ -109,7 +124,7 @@ public class ProgramWeekService {
 
         for (ProgramDayExerciseUpdateDto pdeDto : inputDto.programDayExercises()){
             ProgramDayExercise pde = programDayExerciseMap.get(pdeDto.programDayExerciseId());
-            ProgramDayExercise programDayExercise = convertToProgramDayExercise(pdeDto, pde);
+            ProgramDayExercise programDayExercise = convertToProgramDayExercise(pdeDto, pde, weekNumber);
             programDayExercises.add(programDayExercise);
         }
 
@@ -121,7 +136,9 @@ public class ProgramWeekService {
         return programDay;
     }
 
-    public ProgramDayExercise convertToProgramDayExercise(ProgramDayExerciseUpdateDto inputDto, ProgramDayExercise programDayExercise){
+    public ProgramDayExercise convertToProgramDayExercise(ProgramDayExerciseUpdateDto inputDto,
+                                                          ProgramDayExercise programDayExercise,
+                                                          int weekNumber){
 
         List<ExerciseSession> sessions = programDayExercise.getExerciseSession();
 
@@ -134,7 +151,9 @@ public class ProgramWeekService {
             if (es != null){
                 programDayExercise.removeExerciseSession(es);
             }
-            ExerciseSession exerciseSession = convertToExerciseSession(inputDto.exerciseSession(), programDayExercise);
+            ExerciseSession exerciseSession = convertToExerciseSession(inputDto.exerciseSession(),
+                    programDayExercise,
+                    weekNumber);
             programDayExercise.addExerciseSession(exerciseSession);
         }
 
@@ -151,7 +170,8 @@ public class ProgramWeekService {
      */
 
     public ExerciseSession convertToExerciseSession(ExerciseSessionUpdateDto inputDto,
-                                                    ProgramDayExercise programDayExercise){
+                                                    ProgramDayExercise programDayExercise,
+                                                    int weekNumber){
 
 
         ExerciseSession exerciseSession = new ExerciseSession();

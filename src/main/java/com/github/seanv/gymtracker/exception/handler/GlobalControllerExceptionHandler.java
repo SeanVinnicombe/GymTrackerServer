@@ -97,7 +97,7 @@ public class GlobalControllerExceptionHandler {
     public ApiError handleExerciseNotFound(ExerciseNotFoundException ex){
 
         return new ApiError(
-                HttpStatus.NO_CONTENT.value(),
+                HttpStatus.NOT_FOUND.value(),
                 HttpStatus.NOT_FOUND.name(),
                 ex.getMessage(),
                 LocalDateTime.now()

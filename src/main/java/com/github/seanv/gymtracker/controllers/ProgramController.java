@@ -77,7 +77,7 @@ public class ProgramController {
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = ApiError.class)))
     })
-    @PostMapping("/create")
+    @PostMapping()
     public ResponseEntity<ProgramDto> createProgram(@RequestBody ProgramInputDto inputDto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(programService.createProgram(inputDto));
     }

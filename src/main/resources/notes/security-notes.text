@@ -1,0 +1,17 @@
+
+
+Security Context comparison to Persistence Context & Spring container
+-------------------------------------------------------------------------
+
+Context             |       What it holds       |       Scope
+                    |                           |
+Spring container    |    Beans and dependencies |     Application lifetime
+Persistence Context |   Your tracked entities   |     Single transaction
+                    |       for transaction     |
+Security Context    |   Authenticated user for  |   Single request
+                    |       a request           |
+
+The main difference between the "Contexts" is the scope. Spring container exists for the entire application lifetime.
+Persistence Context lives for a transaction( You can have multiple Persistence contexts - Multiple transactions or
+multiple thread as PC are not thread safe so each thread gets own PC). Security Context lives only for single request.
+
