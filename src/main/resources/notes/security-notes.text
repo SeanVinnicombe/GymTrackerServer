@@ -15,3 +15,43 @@ The main difference between the "Contexts" is the scope. Spring container exists
 Persistence Context lives for a transaction( You can have multiple Persistence contexts - Multiple transactions or
 multiple thread as PC are not thread safe so each thread gets own PC). Security Context lives only for single request.
 
+
+Checkpoints of using JWT
+--------------------------------------
+
+Spring security processes every request through a chain of filters - request has to pass through multiple
+checkpoints before reaching controller
+
+1. Does this request have a token? Extract from 'Authorization' header
+2. Is the token valid? Verify the signature and check that it hasn't expired
+3.Who is the user? Extract their identity from the token and load their details
+4. Put them in Security Context (only alive per request) so the rest of request knows who they are
+5. Are they allowed to hit the endpoint? Check roles/authorities
+
+
+Endpoints Access level
+---------------------------------------
+
+Public -> Login/signup - This means anyone can access the endpoints and use them
+
+Authenticated -> create/getPrograms/etc. - Only verified users may use these endpoints and therefore a valid jwt must
+be used to access these endpoints as this verifies that they are a real and valid user
+
+Authorised -> create exercise - Only certain roles may make changes like this to DB so its important to check that
+only that those with permission to make these changes
+
+UserDetails interface
+----------------------------------
+
+UserDetails is a Spring interface that is used to make authenticated decisions like checking if user is a real user
+, if the details they provided are correct and a few more. To do this, we need to provide UserDetails with at least 3
+pieces of information for it to do its job. Username/Email, password and finally authorities/roles. So it uses first 2 to
+check if user is allowed to use the application and the last to check what exactly the user is allowed to do within the
+application
+
+UserDetails contact:
+
+1. getUsername() -> users email
+2. getPassword() -> retrieve users hashed password
+3. getAuthorities() -> collection of roles and permissions
+4. A few boolean flags -> isAccountNonExpired(), isAccountNonLocked(), isCredentialsNonExpired(), isEnabled()...

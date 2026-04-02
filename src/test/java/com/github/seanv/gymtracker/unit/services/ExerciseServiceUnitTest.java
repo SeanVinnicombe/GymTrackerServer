@@ -64,7 +64,7 @@ public class ExerciseServiceUnitTest {
         Exercise exercise = ExerciseBuilder
                 .aExercise()
                 .withId(50L)
-                .withName("Single arm curls")
+                .withName("Single arm bicep curls")
                 .withMuscleGroup(MuscleGroup.BICEPS)
                 .build();
 
@@ -81,7 +81,7 @@ public class ExerciseServiceUnitTest {
 
         var result = service.addNewExercise(input);
 
-        assertEquals(result.getId(), dto.getId());
+        assertEquals(result, dto);
 
     }
 }

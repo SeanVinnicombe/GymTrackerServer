@@ -3,18 +3,19 @@ package com.github.seanv.gymtracker.entities;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 @Entity
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @Table(name = "users")
-@EqualsAndHashCode
 public class User {
 
     @Id
@@ -46,4 +47,16 @@ public class User {
     )
     private Set<Program> programs = new HashSet<>();
 
+    @Override
+    public boolean equals(Object that) {
+        if (that == null || getClass() != that.getClass()) return false;
+
+        User user = (User) that;
+        return Objects.equals(id, user.id);
+    }
+
+    @Override
+    public int hashCode(){
+        return Objects.hashCode(id);
+    }
 }
