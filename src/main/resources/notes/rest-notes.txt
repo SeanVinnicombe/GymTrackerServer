@@ -1,5 +1,5 @@
 REST
----------------------------
+======================================
 
 REST is stateless, this means it doesn't store any memory or has any recollection of any request you
 did before except the current one. This is why it's important to pass everything the server will need, with the request
@@ -10,7 +10,7 @@ REST or Server to remember as when using sessions for example.
 
 
 What are sessions?
----------------------------
+======================================
 
 Before everytime you wanted to make a request, you would need to verify so that you could make the request, even if
 you literally made request call and got verified 10 seconds ago - very frustrating
@@ -40,7 +40,7 @@ Other problems include:
 
 
 Why JWT is the golden egg
------------------------------
+======================================
 
 JWT uses a token. When you log into the server, it creates a token using your user details(id, roles, etc.),
  signs the token using secret key and then sends it to you. Every future request then uses this token
@@ -49,7 +49,7 @@ JWT uses a token. When you log into the server, it creates a token using your us
  does it's checks and then continues
 
 JWT vs Sessions
-------------------------------
+======================================
 
 Think of ordering from waiter vs at the counter at restaurant.
 

@@ -1,7 +1,7 @@
 
 
 Security Context comparison to Persistence Context & Spring container
--------------------------------------------------------------------------
+======================================================================
 
 Context             |       What it holds       |       Scope
                     |                           |
@@ -17,7 +17,7 @@ multiple thread as PC are not thread safe so each thread gets own PC). Security 
 
 
 Checkpoints of using JWT
---------------------------------------
+======================================
 
 Spring security processes every request through a chain of filters - request has to pass through multiple
 checkpoints before reaching controller
@@ -30,7 +30,7 @@ checkpoints before reaching controller
 
 
 Endpoints Access level
----------------------------------------
+======================================
 
 Public -> Login/signup - This means anyone can access the endpoints and use them
 
@@ -41,7 +41,7 @@ Authorised -> create exercise - Only certain roles may make changes like this to
 only that those with permission to make these changes
 
 UserDetails interface
-----------------------------------
+======================================
 
 UserDetails is a Spring interface that is used to make authenticated decisions like checking if user is a real user
 , if the details they provided are correct and a few more. To do this, we need to provide UserDetails with at least 3
@@ -55,3 +55,39 @@ UserDetails contact:
 2. getPassword() -> retrieve users hashed password
 3. getAuthorities() -> collection of roles and permissions
 4. A few boolean flags -> isAccountNonExpired(), isAccountNonLocked(), isCredentialsNonExpired(), isEnabled()...
+
+
+User class that implements UserDetails vs create wrapper class that wraps User and implements UserDetails
+================================================================================================================
+
+When implementing Springs UserDetails into application, there is two ways to go about it. First, you could
+create User entity and then implement UserDetails, therefore it both your domain entity and security principal.
+Secondly, you could choose to make use of wrapper pattern and create class that's a wraps User class and also
+implements UserDetails, which in th end help keeps domain entity clean.
+
+So which option to choose?
+
+The best option would be the 2nd one for a few reasons:
+
+1. Separation of concern - User should be responsible for handling data and holding data from db. If you implement
+ UserDetails you are now increasing its responsibilities from that of just entity to now entity and security
+
+2. Keep User as just entity as this makes mapping of Dto easier and also preserves data integrity,
+
+3. Framework coupling - If User implements UserDetails, it means the entity its now coupled to Spring Security.
+ If you ever change Security frameworks, change auth approach or reuse the User entity in different context, ot carries
+ Security baggage with it. Using wrapper means User doesn't know about the framework its in, only the wrapper
+ knows about Spring Security. This is part of a broader principle ** keeping your domain model framework agnostic **.
+ Entities should model your business domain, not make infrastructure choices
+
+4. Wrapper pattern itself - The scenario we are describing is a well established pattern called **Adapter**.
+   You have an inteface you need to satisfy( UserDetails ) and an existing class that has data,
+   but is the wrong shape( User ). Instead of changing existing classes, you create a adapter that wraps it and translates
+   between the two.
+
+  Adapter pattern is everywhere in software - not just security. Anytime you need to make something fit an interface
+  without changing the original thing, you are reaching for Adapter.
+
+5.Testability - A User entity with no framework dependencies is much easier to test and to construct. The moment it
+   implements UserDetails it has methods like isAccountNonExpired() that need to return meaningful values in tests too,
+   adding noise to tests that have nothing to do with Security

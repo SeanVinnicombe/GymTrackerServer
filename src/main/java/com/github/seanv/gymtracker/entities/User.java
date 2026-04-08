@@ -1,5 +1,6 @@
 package com.github.seanv.gymtracker.entities;
 
+import com.github.seanv.gymtracker.entities.enums.Role;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -39,6 +40,10 @@ public class User {
     @Column(name = "password")
     @NotBlank
     private String password;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "role")
+    private Role role;
 
     @OneToMany(
             mappedBy = "user",

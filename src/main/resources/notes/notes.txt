@@ -1,7 +1,7 @@
 
 
 Threads (Real world example)
-------------------------------
+============================================
 
 Think of server like restaurant kitchen. whe order comes in, a chef picks up order and handles it start to finish.
 
@@ -17,10 +17,53 @@ theSecurityContext. A Thread Local is like giving each chef a personal safe pock
 Chef A has User A identity and Chef B has User B identity. They are completely isolated,
 even though they are in the same kitchen
 
-Therefore, Spring reaches into each threads own personal safe pocket to get that requests authenticated user.
+Therefore, Spring reaches into each thread own personal safe pocket to get that requests authenticated user.
 No sharing and no confusion between users
 
 
+Understanding of use of Enums
+==============================================
+
+When storing data as a String such as "private String role = 'Admin'", there's nothing actually in place to stop this
+ from happening:
+ * user.setRole("Adminn") //typo
+ * user.setRole("administrator") // different casing
+ * user.setRole("GOD_MODE") // completely invalid
+
+ Nothing prevent these errors happening at compile time. Bugs will only surface at runtime, which means potentially in
+ production. Enum solves this by saying **these are the only valid values that exist for this concept, known
+ at compile time**
+
+ What an Enum actually is:
+-------------------------------------------
+
+ Enum is a special type in Java that represents a fixed set of named constants. Think of class, but with predefined
+ and closed set of instances.
+
+ Compiler now enforces validity:
+ * user.setRole(Role.ADMIN) // valid
+ * user.setRole(Role.ADMINN) // compile error - doesn't exist
+
+ now you can never have invalid role
+
+ Enums are more than just constants:
+-----------------------------------------------
+
+Enums are not just named integers but ar actually full objects. They can have fields. contractors and methods. Each contants
+(USER, ADMIN) is actually instance of the enum class with its own data.
+
+ Enums with JPA
+-----------------------------------------------
+
+When storing Enum in DB, there is two options:
+
+1. @Enumerated(EnumType.ORDINAL) // stores 0, 1, 2... (the position)
+2. @Enumerated(EnumType.STRING)  // stores "USER", "ADMIN"
+
+Always use "STRING"
+
+With Ordinal, if you ever reorder your enums or insert new on in the middle, every existing row in DB is now pointing
+to incorrect role. Silent but catastrophic data corruption
 
 
 
