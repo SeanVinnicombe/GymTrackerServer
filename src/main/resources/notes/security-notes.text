@@ -81,7 +81,7 @@ The best option would be the 2nd one for a few reasons:
  Entities should model your business domain, not make infrastructure choices
 
 4. Wrapper pattern itself - The scenario we are describing is a well established pattern called **Adapter**.
-   You have an inteface you need to satisfy( UserDetails ) and an existing class that has data,
+   You have an interface you need to satisfy( UserDetails ) and an existing class that has data,
    but is the wrong shape( User ). Instead of changing existing classes, you create a adapter that wraps it and translates
    between the two.
 
@@ -91,3 +91,130 @@ The best option would be the 2nd one for a few reasons:
 5.Testability - A User entity with no framework dependencies is much easier to test and to construct. The moment it
    implements UserDetails it has methods like isAccountNonExpired() that need to return meaningful values in tests too,
    adding noise to tests that have nothing to do with Security
+
+
+Spring Security 6 vs older versions
+========================================================================================================
+
+Spring Security 5 and older versions
+-------------------------------------------------
+
+during older versions, you would configure Security by extending a class called "WebSecurityConfigurerAdapter" and then
+overriding it's methods.
+
+Example:
+
+@Configuration
+public class SecurityConfig extends WebSecurityConfigurerAdapter {
+
+    @Override
+    protected void configure(HttpSecurity http) throws Exception {
+        http
+            .authorizeRequests()
+            .antMatchers("/public/**").permitAll()
+            .anyRequest().authenticated();
+    }}
+
+This worked but it had a functional design problem - you were inheriting your security config from a base class. If you
+wanted customize behaviour you had to know which method to override, what to call on 'super' and what the base class
+was already doing behind the scenes.
+
+It also meant you could only have one config class, since you can only extend one class in Java - tight coupling
+
+
+Spring Security 6 changes
+-------------------------------------------------
+
+SS6 has deprecated and removed "WebSecurityConfigurerAdapter" entirely. The new approach is based on declaring beans
+instead of extending classes
+
+Instead of overriding methods, you declare a "SecurityFilterChain" bean that describes your security rules
+
+Example:
+
+@Configuration
+public class SecurityConfig {
+
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http
+            .authorizeHttpRequests(auth -> auth
+                .requestMatchers("/auth/**").permitAll()
+                .anyRequest().authenticated()
+            );
+        return http.build();
+    }
+}
+
+This follows composition over inheritance - a core design principle. Rather than inheriting behaviour from a parent
+class, you're building and providing building and providing exactly the configuration you need as a bean
+
+What is SecurityFilterChain exactly?
+-------------------------------------------------
+
+Remember Spring Security is an airport with checkpoints. SecurityFilterChain is the definition of those checkpoints.
+It's a chain that every request must pass through in order.
+
+Each filter has one responsibility. Example of filter chain in our case:
+
+Request comes in
+       ↓
+[ CORS filter ]
+       ↓
+[ JWT filter ] ← your custom filter - extracts and validates token
+       ↓
+[ Authentication filter ]
+       ↓
+[ Authorization filter ] ← checks if user can access this endpoint
+       ↓
+Your Controller
+
+SecurityFilterChain is where you configure what the chain looks like - which endpoints are public, which need
+authentication, what kind of session management to use, and where custom jwt filter slots in
+
+
+
+CSRF(Cross Site Request Forgery)
+================================================================================
+
+It's is a type of attack.
+
+If you are logged into bank at "bank.com", the bank uses a cookie for the session that automatically gets sent with
+every request. Though now you visit a malicious site and it has a hidden form with
+"bank.com/transfer?to=hacker&amount=10000". When the page loads, it submits that form automatically.
+
+The browser - without knowing - sends that request to "bank.com" and automatically includes the cookie because that's
+how browsers work with cookies. The bank see's this valid cookie and proceeds with the transfer
+
+Attack works because:
+
+1. Browser automatically attaches cookie to request
+2. Server can't tell when you intentionally send a request and when an unintentional one comes through
+
+How CSRF protection works
+--------------------------------------------------
+
+Traditional defense is using CSRF token - a random value that server generates and embeds in every form. When form is
+submitted, server checks to see if valid token is present
+
+A malicious site can't forge a token because it can't read the contents of bank page - browsers block cross origin
+reads for security reason. So the malicious form submission arrives without a valid CSRF taken and get's rejected
+
+Why REST disables CSRF
+---------------------------------------------------
+
+CSRF relies on two things:
+
+1. Cookies being automatically attached by the browser
+2. Session based auth on server
+
+REST uses JWT tokens sent via "Authorization" header, not cookies. Browsers do not automatically attach headers the way
+they do with cookies. A malicious site can send a request, but it can't set the "Authorization" header with the jwt
+token as it does not have access to it.
+
+Therefore CSRF protection is unnecessary and adds unwanted complexity and overhead.
+
+
+
+
+

@@ -50,6 +50,17 @@ public class GlobalControllerExceptionHandler {
         );
     }
 
+    @ExceptionHandler(UsernameNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ApiError handleUsernameNotFoundException(UsernameNotFoundException ex){
+        return new ApiError(
+                HttpStatus.NOT_FOUND.value(),
+                HttpStatus.NOT_FOUND.name(),
+                ex.getMessage(),
+                LocalDateTime.now()
+        );
+    }
+
     // ==================== PROGRAM ====================
 
     @ExceptionHandler(ProgramNotFoundException.class)
