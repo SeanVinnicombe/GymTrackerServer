@@ -65,6 +65,52 @@ Always use "STRING"
 With Ordinal, if you ever reorder your enums or insert new on in the middle, every existing row in DB is now pointing
 to incorrect role. Silent but catastrophic data corruption
 
+Why split artifacts in pom.xml(jjwt-api,jjwt-impl,jjwt-jackson)?
+=========================================================================
+
+This is a deliberate design pattern called API/Implemetation separation.
+
+Another example of the design pattern is: "List<Program> programs = new ArrayList<>();"
+
+You code against the "List" interface but the actual work gets done by "ArrayList". If tomorrow Java introduces
+better list implementation, you could swap ArrayList for it without changing ant of the code that uses List.
+
+jjwt applies the same thinking:
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* jjwt-api: the interface and the contracts you write your code against. Things like "Jwts.builder()", "Claims"...
+This is what your code directly references and imports.
+
+* jjwt-impl: the actual implementation of those interfaces(business logic of methods). the real logic that signs and
+parses tokens. You never reference the classes directly in your code
+
+* jjwt-jackson: handles JSON serialization/deserialization of the jwt payload using Jackson. JWT payloads are
+JSON - something is needed to convert it
+
+What does "<scope>runtime</scope>" mean in dependency?
+=================================================================================
+
+Maven controls when a dependency is available during the build lifecycle.
+
+Most common scores includes - "compile(when application is building and starting up)",
+"runtime(when application is running)", "test(fot tests)"
+
+Scope       |       Available at compile        |       Available at runtime
+--------------------------------------------------------------------------------------
+compile     |                 Yes               |                   Yes
+runtime     |                  No               |                   Yes
+test        |                  No               |             Yes(in tests only)
+
+So dependencies you directly reference in code(like jjwt-api mentioned earlier) will need to be available at compile
+time but code that you don't directly use (jjwt-imp), there's no reason for it to be on the classpath - code doesn't need
+it to compile successfully. Though at runtime, when code calls certain methods from let's say jjwt-api, JVM needs the
+implementation of those methods to execute so it needs to be present at runtime
+
+Marking dependencies as runtime scope enforces good practice.
+
+
+
+
 
 
 

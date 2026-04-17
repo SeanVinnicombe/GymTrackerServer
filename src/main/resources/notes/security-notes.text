@@ -173,6 +173,22 @@ SecurityFilterChain is where you configure what the chain looks like - which end
 authentication, what kind of session management to use, and where custom jwt filter slots in
 
 
+Why does JWT slot in before Spring authentication?
+----------------------------------------------------
+
+Spring's built in authentication expects to find an authenticated user already in SecurityContext when it runs.
+Your JWT filters job is to put that user there. If Springs authentication runs first, it will always find an empty
+SecurityContext, and therefore every request will fail as it thinks there are no authenticated users, even if the
+JWT had a valid user.
+
+So the order is:
+
+1. Your JWT filter runs -> validates token -> extracts user -> puts them in SecurityContext
+2. Spring authentication filter runs -> looks in SecurityContext -> finds user -> allows request through
+
+JWT has to run first to setup the SecurityContext which everything else depends on.
+
+
 
 CSRF(Cross Site Request Forgery)
 ================================================================================
@@ -213,6 +229,108 @@ they do with cookies. A malicious site can send a request, but it can't set the 
 token as it does not have access to it.
 
 Therefore CSRF protection is unnecessary and adds unwanted complexity and overhead.
+
+
+Pieces for SecurityConfig class
+======================================================================================
+
+Firstly, you will have SecurityFilterChain, which needs to configure the following:
+
+1. Disable CSRF - REST is stateless
+2. Session management - since REST is stateless, you want to explicitly tell Spring not to create or use HTTP session
+   The setting is "SessionCreationPolicy.STATELESS"
+3. Endpoint rules - Declare which endpoints require authentication and which are public
+4. JWT filter - needs to slot into chain before Spring built in authentication
+
+Secondly, you will need two additional beans in this config class:
+
+1. PasswordEncoder - Spring Security never stores or compares plain text passwords. You will need to use
+BCryptPasswordEncoder.
+2.AuthenticationManager - this is what Spring Security uses to process a login attempt. Get it from
+AuthenticationConfiguration that Spring provides
+
+What is BCrypt and why its the preferred hashing algorithm over MD5
+---------------------------------------------------------------------
+
+BCrypt is a password hashing algorithm - difference between hashing and encryption as they are fundamentally different
+
+Encryption is two way - you encrypt something and can decrypt it back to its original state using a key. Problem is if
+someone gets the key, they can decrypt all your passwords.
+
+Hashing is one way - you put a password in and get a fixed length string out. There is no way to reverse it back to
+original state or value. You cannot decrypt a hash
+
+So login verification works by hashing a users password, an then comparing that hashed value with one in DB. If they
+match, the passwords are correct.You never store or compare the plain text.
+
+Example:
+
+Registration:  "mypassword123" → BCrypt → "$2a$10$xK8Ge4Q..." → stored in DB
+Login attempt: "mypassword123" → BCrypt → "$2a$10$xK8Ge4Q..." → matches ✅
+Login attempt: "wrongpassword" → BCrypt → "$2a$10$zX9Hf5R..." → no match ❌
+
+
+Concept of JWT signing
+=================================================================================
+
+How a JWT works
+----------------------------------------------------------
+
+When a user logs in successfully, the server creates a jwt. The process is as follows:
+
+Step 1: Build the Header and payload
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The header and payload are just json objects, Base64 encoded.
+header:  { "alg": "HS256", "typ": "JWT" }
+payload: { "sub": "user@email.com", "exp": 1234567890 }
+
+Encoded:
+
+eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyQGVtYWlsLmNvbSJ9
+
+Step 2: Create the signature
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The server takes the encoded header and and payload amd runs them through a simple signing algorithm using a secret key
+that only the server knows.
+
+signature = HMAC_SHA256(header + "." + payload, secretKey)
+
+Full token = header.payload.signature
+
+Why tampering is impossible
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If an attacker intercepts the token and tries to change payload to give himself admin access.
+payload: { "sub": "user@email.com", "role": "ADMIN" } ← tampered
+
+They re-encode the payload and attach it to the token.But now the signature no longer matches-because the signature was
+computed from the original payload using secret key and the attacker doesnt have it.
+
+When the server receives the tampered token it does this:
+1. Take the header and payload from the token
+2. Recompute the signature using your secret key
+3. Compare recomputed signature with the signature in the token
+4. They don't match → token rejected
+
+The attacker can read the payload-it's Base64, not encrypted. But they cannot modify it without invalidating the
+signature. They cannot forge a valid signature without knowing the secret key.
+
+JWT is not encrypted - its signed
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The payload is Base64 encoded, not encrypted. Anyone who get's access to token can decode it and read the data.
+Therefore you should never put sensitive data in the payload.
+
+What jwt guarantees is integrity-you know the token hasn't been tampered with. Not confidentiality.
+
+
+
+
+
+
+
 
 
 
