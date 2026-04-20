@@ -326,6 +326,28 @@ Therefore you should never put sensitive data in the payload.
 What jwt guarantees is integrity-you know the token hasn't been tampered with. Not confidentiality.
 
 
+Where should secret key live?
+
+==================================================================================
+
+Spring has built in configuration system built around application-properties file. This is where application reads
+its configuration
+
+Though its important to ensure that the secret never get's exposed, like for example commiting file to Git for everyone
+to now see.
+
+Best approach - Environment variables
+---------------------------------------------------------------
+
+# application.properties
+jwt.secret=${JWT_SECRET}  # reads from environment variable at runtime
+
+Then on your machine you set environment variable: JWT_SECRET=mySuper$ecretKeyThatNobodyKnows123!
+
+Springboot see's ${JWT_SECRET} and replaces it with the environment variable value present at startup. This allows the
+application-properties to safely be commited to Github
+
+
 
 
 
