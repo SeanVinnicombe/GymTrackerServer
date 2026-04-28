@@ -5,9 +5,10 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -20,12 +21,14 @@ public class JwtAuthFilter extends OncePerRequestFilter { // extending class ens
 
     private final JwtService jwtService;
     private final SecurityService securityService;
+    private final AuthenticationEntryPoint authenticationEntryPoint;
 
 
     @Autowired
-    public JwtAuthFilter(JwtService jwtService, SecurityService securityService){
+    public JwtAuthFilter(JwtService jwtService, SecurityService securityService, AuthenticationEntryPoint authenticationEntryPoint){
         this.jwtService = jwtService;
         this.securityService = securityService;
+        this.authenticationEntryPoint = authenticationEntryPoint;
     }
 
     /**
@@ -67,7 +70,10 @@ public class JwtAuthFilter extends OncePerRequestFilter { // extending class ens
             }
         }
 
-        filterChain.doFilter(request, response);
-
+        try{
+            filterChain.doFilter(request, response);
+        } catch (BadCredentialsException ex){
+            authenticationEntryPoint.commence(request, response, ex);
+        }
     }
 }

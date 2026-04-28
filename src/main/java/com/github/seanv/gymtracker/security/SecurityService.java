@@ -1,12 +1,12 @@
 package com.github.seanv.gymtracker.security;
 
 import com.github.seanv.gymtracker.entities.User;
-import com.github.seanv.gymtracker.exception.type.UsernameNotFoundException;
 import com.github.seanv.gymtracker.repositories.UserRepository;
 import org.jspecify.annotations.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 //bridge between spring security and DB

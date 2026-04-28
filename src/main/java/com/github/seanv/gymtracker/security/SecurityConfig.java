@@ -1,5 +1,6 @@
 package com.github.seanv.gymtracker.security;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,11 +21,15 @@ public class SecurityConfig {
 
     private final JwtAuthFilter jwtAuthFilter;
     private final CustomAuthenticationEntryPoint authenticationEntryPoint;
+    private final CustomAccessDeniedHandler accessDeniedHandler;
 
     @Autowired
-    public SecurityConfig(JwtAuthFilter jwtAuthFilter, CustomAuthenticationEntryPoint authenticationEntryPoint){
+    public SecurityConfig(JwtAuthFilter jwtAuthFilter,
+                          CustomAuthenticationEntryPoint authenticationEntryPoint,
+                          CustomAccessDeniedHandler accessDeniedHandler){
         this.jwtAuthFilter = jwtAuthFilter;
         this.authenticationEntryPoint = authenticationEntryPoint;
+        this.accessDeniedHandler = accessDeniedHandler;
     }
 
 
@@ -68,13 +73,27 @@ public class SecurityConfig {
                 .formLogin(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .exceptionHandling(ex ->
-                        ex.authenticationEntryPoint(authenticationEntryPoint))
+                        ex.authenticationEntryPoint(authenticationEntryPoint)
+                                .accessDeniedHandler(accessDeniedHandler))
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)); // REST is stateless, we're not using
                                                                     // sessions but token
 
         return http.build();
     }
+
+    /**
+     * AuthenticationEntryPoint - This is a Spring interface that defines how to handle unauthorized requests.
+     * We can't use custom exceptions as the authentication process happens before the controller is even called,
+     * and happens in the filter chain, which Spring handles seperately. So we create custom version of interface so we
+     * can have control of how errors are disaplyed
+     *
+     * AccessDeniedHandler - This is a Spring interface that defines how to handle unauthorized requests. It works the
+     * same as the mentioend above, but for access denied.
+     *
+     * .exceptionHandling() - this is our way of now providing spring with our custom exception handlers for
+     * exceptions that occur in the filter chain
+     */
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception{

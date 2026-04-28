@@ -4,6 +4,7 @@ import com.github.seanv.gymtracker.exception.model.ApiError;
 import com.github.seanv.gymtracker.exception.type.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -38,6 +39,17 @@ public class GlobalControllerExceptionHandler {
         );
     }
 
+    @ExceptionHandler(InternalAuthenticationServiceException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public ApiError handleInternalAuthenticationServiceException(InternalAuthenticationServiceException ex){
+        return new ApiError(
+                HttpStatus.UNAUTHORIZED.value(),
+                HttpStatus.UNAUTHORIZED.name(),
+                "Invalid email or password",
+                LocalDateTime.now()
+        );
+    }
+
     // ==================== USER ====================
 
     @ExceptionHandler(UserNotFoundException.class)
@@ -51,16 +63,16 @@ public class GlobalControllerExceptionHandler {
         );
     }
 
-    @ExceptionHandler(UsernameNotFoundException.class)
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ApiError handleUsernameNotFoundException(UsernameNotFoundException ex){
-        return new ApiError(
-                HttpStatus.NOT_FOUND.value(),
-                HttpStatus.NOT_FOUND.name(),
-                ex.getMessage(),
-                LocalDateTime.now()
-        );
-    }
+//    @ExceptionHandler(UsernameNotFoundException.class)
+//    @ResponseStatus(HttpStatus.NOT_FOUND)
+//    public ApiError handleUsernameNotFoundException(UsernameNotFoundException ex){
+//        return new ApiError(
+//                HttpStatus.NOT_FOUND.value(),
+//                HttpStatus.NOT_FOUND.name(),
+//                ex.getMessage(),
+//                LocalDateTime.now()
+//        );
+//    }
 
     @ExceptionHandler(UserAlreadyExistsException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
