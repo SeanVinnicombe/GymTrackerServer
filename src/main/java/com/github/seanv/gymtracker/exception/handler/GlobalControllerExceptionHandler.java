@@ -3,6 +3,7 @@ package com.github.seanv.gymtracker.exception.handler;
 import com.github.seanv.gymtracker.exception.model.ApiError;
 import com.github.seanv.gymtracker.exception.type.*;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -60,6 +61,29 @@ public class GlobalControllerExceptionHandler {
                 LocalDateTime.now()
         );
     }
+
+    @ExceptionHandler(UserAlreadyExistsException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ApiError handleUserAlreadyExistsException(UserAlreadyExistsException ex){
+        return new ApiError(
+                HttpStatus.BAD_REQUEST.value(),
+                HttpStatus.BAD_REQUEST.name(),
+                ex.getMessage(),
+                LocalDateTime.now()
+        );
+    }
+
+    @ExceptionHandler(BadCredentialsException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public ApiError handleBadCredentialsException(BadCredentialsException ex){
+        return new ApiError(
+                HttpStatus.UNAUTHORIZED.value(),
+                HttpStatus.UNAUTHORIZED.name(),
+                "Invalid username or password.",
+                LocalDateTime.now()
+        );
+    }
+
 
     // ==================== PROGRAM ====================
 

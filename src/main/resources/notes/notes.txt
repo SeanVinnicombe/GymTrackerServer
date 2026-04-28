@@ -108,7 +108,116 @@ implementation of those methods to execute so it needs to be present at runtime
 
 Marking dependencies as runtime scope enforces good practice.
 
+Checked vs Unchecked Exceptions revision
+=============================================================================
 
+Checked Exceptions
+----------------------------------
+
+These refer to exceptions the compiler forces you to deal with. If a method can throw a checked exception, you must
+either handle yourself(try catch) or declare you are passing the problem to caller(declaring a "throws {Exception}
+in method").
+
+The compiler refuses to compile code if you do neither. It's Java's way of saying "this operation can fail in a
+meaningful way, you need to plan for it"
+
+Unchecked Exception
+------------------------------------
+
+These extend RuntimeException. The compiler doesnt force you to handle or declare them.
+They can propagate upwards in call stack silently until something catches them or the application crashes
+
+Example:
+
+// no throws declaration needed even though this could throw
+public void doSomething() {
+    throw new IllegalArgumentException("bad input"); // unchecked
+}
+
+
+Why are custom exception unchecked exceptions?
+-----------------------------------------------
+
+Exceptions in GlobalExceptionHandler consist of exceptions like ProgramNotFoundException and UserNotFoundException and
+are ost likely extending Runtime exception
+
+This is deliberate and Spring industry standard:
+
+If they were checked, then every method in call chain would need to declare 'throws ProgramNotFoundException'
+
+By making them unchecked, they propagate up automatically through Controller -> Service -> Repo and then eventually
+handled by GlobalExceptionHandler - clean and no noise
+
+How does Spring handles checked exceptions
+------------------------------------------------------
+
+Spring goes through process called Application Context Initialization, during this process it:
+1. Scans for all beans marked my annotations
+2. Creates instances of them in the right order based on dependencies
+3. Wires dependencies together via injection
+4. Calls @Bean methods to create and register those beans
+
+So Spring calls all Beans during startup to create and register them
+
+What happens if Bean throws exception
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If a bean throws an exception during start up, spring catches it at th application context level and does this:
+
+@Bean method throws Exception
+           ↓
+Spring catches it internally
+           ↓
+Wraps it in a BeanCreationException
+           ↓
+Application context fails to initialize
+           ↓
+Spring Boot shuts down with an error
+
+Tells us a bean method threw exception and context couldn't be built. This will lead to application not starting up
+as it will enforce us to resolve the issue as it sees it as a meaningful issue that needs to be dealt with.
+So in the end when you use" throws Exception" in a method, you are technically saying - "I acknowledge this can fail,
+If it does, I'm passing the problem to whoever called this - in this case the Spring application context - and
+trusting it to handle startup failure appropriately"
+
+What are Records and their uses?
+=========================================================================
+
+Java records are like classes except they have a lot less boilerplate and the fields are immutable, as they are
+generated as private final fields which means once they have been assigned a value, they cannot be reassigned a new value.
+For Records Java automatically generates:
+1. Private final fields for each component
+2. A constructor taking all components
+3. getEmail() and getPassword() accessor methods
+4.equals() and hashCode() based on all fields
+5. toString()
+
+It effectively eliminates all the boilerplate of a generic class.
+
+Validation with Records
+-----------------------------------------------------------
+
+Validation annotations like @NotNull or @NotBlank work on records but syntax is slightly different as you annotate the
+components directly.
+
+public record LoginDto(
+    @NotBlank @Email String email,
+    @NotBlank String password
+) {}
+
+Though for any of those validation rules to apply, the @Valid annotation needs to be applied to the request body
+parameter on you controller method.
+
+Where should validation live, DTO or Entity?
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Validation should live on the DTO, not Entity.
+
+The Entity is a representation of the table in DB and should only reflect what's actually stored. Yuour DTO is your API
+contract - it should enforce what's acceptable as input.
+
+Also, if validation fails, better to catch it at the DTO before it reaches service or touches the DB. Data should
+always be validated before it reaches the entity
 
 
 
