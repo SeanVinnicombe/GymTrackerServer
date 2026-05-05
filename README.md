@@ -1,18 +1,18 @@
 # Gym Tracker Server
 
-A gym tracking app which allows users to create and log workouts for gym progression
+A gym tracking app that allows users to create and log workouts for gym progression
 -----------------------
 
 ## Project Status
 
-This is currently an MVP(15-20 hours currently) to first focus on building correct structures and validating endpoints to ensure flow of data 
-is working correctly and the setup of project was done correctly and according to industry standard before moving onto
-more production ready features and implementations
+This is currently an MVP (25–30 hours currently) to first focus on building correct structures and validating endpoints to ensure the flow of data 
+is working correctly and the setup of the project was done correctly and according to industry standard before moving onto
+more production ready features and implementations.
 
 ## Goals for MVP
 - Ensure API structures are working with relevant documentation
-- Flow of data between API's and DB works correctly
-- Clear layer: Controller -> Service -> Repo
+- Flow of data between API and DB works correctly
+- Clear layer: Controller → Service → Repo
 - Add DTO mappings and use of DTO's as data carriers
 - Set up foundation and initial Unit Tests
 
@@ -33,10 +33,10 @@ more production ready features and implementations
 - Global Exception handling
 - Foundation test coverage for Services and Controller
 - Test Builders for testing
+- Spring Security with JWT
 
 
 ## To Still be implemented
-- Authentication/Authorization with Spring Security
 - Environments/profiles
 - DB migrations - Flyway
 - Container usage - Docker
@@ -46,8 +46,16 @@ more production ready features and implementations
 The goal was to first set up a foundation and ensure structures were in place in which everything can easily be 
 implemented and integrated. The first goal was focusing on architecture before introducing production features
 
+## Latest changes
+- Added Spring Security configuration with JWT filter chain
+- Implementation of UserPrincipal, SecurityService, JwtService
+- Added AuthController and AuthService for login/register endpoints
+- Implemented CustomAuthenticationEntryPoint and CustomAccessDeniedHandler
+- Improved global exception handling for security exceptions
+
+
 ## Next milestones
-- Introduction of auth and  secure endpoints
+- Introduction of auth and secure endpoints
 - Introducing profiles 
 - Include DB migration
 - Improve test depth

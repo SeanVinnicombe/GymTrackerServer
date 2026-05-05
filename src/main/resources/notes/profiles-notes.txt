@@ -1,0 +1,95 @@
+Problems with only using a single profile
+=====================================================
+
+When using a single profile, this means in development and in production, we make use of only one config
+file(application.properties). This can cause issues and create complications, some of which are:
+
+1. Inflexibility - one config file forces identical setup everywhere
+2.Security Risk - production secrets become exposed in the development environment
+3. Resource mismatch - production scale resources are forced to be used in local development environment.
+
+What are Spring profiles?
+===============================================
+
+A profile is simply a named configuration set that activates under specific conditions. Instead of one
+application.properties file, you will have multiple application.properties files:
+
+application.properties → shared config, active always
+application-dev.properties → dev-specific config, active in development
+application-prod.properties → prod-specific config, active in production
+
+Spring merges them at runtime - shared config at the base, active profile's config overrides where needed.
+
+Declaring which profile to use?
+------------------------------------
+
+There are two options:
+
+1. In application.properties(base): "spring.profiles.active=dev"
+
+2. Environment variable (better approach for production): "SPRING_PROFILES_ACTIVE=prod"
+The environment variable approach is recommended for production because it means your 'application.properties' doesn't
+hardcode which profile is active - the environment itself decides.
+
+
+Where does environment variables get set in production environment
+-----------------------------------------------------------------------------
+
+They live on the server. Just like how they live on a machine for Intellij, on a production server they are set at the
+OS level or injected by the deployment platform.
+
+So where do production secrets actually live
+-------------------------------------------------------
+
+Modern production environments have a more sophisticated answer: secrets managers
+
+There are dedicated tools specifically for storing and accessing sensitive values.
+For example,
+* AWS Secrets Manager — if hosting on Amazon
+* Azure Key Vault — if hosting on Microsoft Azure
+* HashiCorp Vault — cloud-agnostic, very popular
+* Kubernetes Secrets — when we get to Kubernetes
+
+
+What should live on each profile?
+------------------------------------------------
+
+It's important to realize each file should only contain configuration that is relevant to that profile. Each has their own
+responsibility and purpose, and that should be taken into account when designing your profiles.
+
+Each fie should contain:
+
+* Secret keys - environment-specific keys should not be in the shared config file.
+* DB credentials and URL - environment-specific
+* Logging levels - environment-specific. Dev might want more verbose logging.
+* Server ports - environment-specific.
+
+Shared application.properties file should contain:
+* Application name
+* JWT expiry time should be the same for all environments
+* JPA properties(ddl-auto)
+
+ddl-auto configuration values for application.properties
+----------------------------------------------------------
+
+* create - drops and recreates schema on every startup - destroys all data
+* create-drop - Creates on startup, drops on shutdown - destroys all data
+* update - updates schema if needed - dangerous in production
+* validate - check entities match schema - safe in production
+* none - Does nothing - recommended for prod with flyway
+
+"Destroys all data" literally means that all data in the database is deleted. Table, rows and data within rows.
+
+When would this be necessary?
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+1. Early development - when the schema is constantly changing. You are adding fields, renaming columns and restructuring
+relationships. Rather than manually writing 'alter table' scripts, everytime you change an entity, 'create' just rebuilds
+everything fresh.
+2. Automated testing - integration tests often use 'create-drop' so each test run starts with a completely clean database.
+This allows tests to become predictable and isolated.
+3. Onboarding - a new developer clones the repo,starts the application and gets a fresh database matching the current
+entity structure immediately. No manual setup.
+
+
+
