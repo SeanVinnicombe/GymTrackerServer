@@ -37,10 +37,9 @@ more production ready features and implementations.
 
 
 ## To Still be implemented
-- Environments/profiles
-- DB migrations - Flyway
-- Container usage - Docker
+- Container usage – Docker
 - More robust Integration tests
+- Introduction of Spring AI
 
 ## Reason for missing features and implementations
 The goal was to first set up a foundation and ensure structures were in place in which everything can easily be 
@@ -52,11 +51,10 @@ implemented and integrated. The first goal was focusing on architecture before i
 - Added AuthController and AuthService for login/register endpoints
 - Implemented CustomAuthenticationEntryPoint and CustomAccessDeniedHandler
 - Improved global exception handling for security exceptions
+- Introduced profiles for development and production environments
+- Added Flyway for DB migrations
 
 
 ## Next milestones
-- Introduction of auth and secure endpoints
-- Introducing profiles 
-- Include DB migration
 - Improve test depth
-- Look into tools for deployment
+- Look into tools for deployment (Docker, Kafka and Kubernetes)
