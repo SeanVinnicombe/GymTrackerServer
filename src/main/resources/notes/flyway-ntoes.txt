@@ -1,0 +1,30 @@
+What is flyway?
+====================
+
+It's an open source database migration tool that enables version control for SQL scripts similar to how GIT manages code.
+It automates schema changes-creating tables, adding columns, updating data - using versioned SQL or Java scripts,
+ensuring databases stay synced across environments.
+
+Problems flyway solves
+==========================================
+
+1. Schema Drift - everyone's DB stays in sync automatically
+2. Onboarding - a new developer clones repo, starts an app, Flyway runs all migration scripts in order, DB is instantly up
+to date
+3. Audibility - every schema change is a versioned SQL file committed to Git. You can see exactly what changed, and who
+made the change. With 'ddl-auto=update', Hibernate just silently modifies your schema with no record of what it did
+
+NB! - When using Flyway, ensure JDBC dependency doesn't appear in pom as part of classpath
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+When Spring Boots autoconfiguration sees both JDBC and JPA starters in pom, it enters strict repository config mode.
+In strict mode Spring becomes more conservative about autoconfiguration to avoid conflicts between the two modules.
+This suppresses Flyway's autoconfiguration because Spring isn't sure which data module should own the database.
+
+Remember JPA already includes JDBC under the hood. Spring-boot-starter-data-jpa transitively pulls in everything JDBC
+provides plus Hibernate on top. Having both explicitly is redundant and causes this conflict.
+
+Remove H2 in memory DB!!!
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+When Spring sees H2 on the classpath alongside Postgres config, it gets confused about which DB Flway should connect to.

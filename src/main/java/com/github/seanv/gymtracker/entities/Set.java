@@ -3,7 +3,6 @@ package com.github.seanv.gymtracker.entities;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
-import org.springframework.data.relational.core.sql.In;
 
 import java.util.Objects;
 
