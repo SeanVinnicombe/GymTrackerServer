@@ -14,8 +14,11 @@ to date
 3. Audibility - every schema change is a versioned SQL file committed to Git. You can see exactly what changed, and who
 made the change. With 'ddl-auto=update', Hibernate just silently modifies your schema with no record of what it did
 
-NB! - When using Flyway, ensure JDBC dependency doesn't appear in pom as part of classpath
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Important things to remember!
+===========================================
+
+When using Flyway, ensure JDBC dependency doesn't appear in pom as part of classpath
+---------------------------------------------------------------------------------------------
 
 When Spring Boots autoconfiguration sees both JDBC and JPA starters in pom, it enters strict repository config mode.
 In strict mode Spring becomes more conservative about autoconfiguration to avoid conflicts between the two modules.
@@ -28,3 +31,52 @@ Remove H2 in memory DB!!!
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 When Spring sees H2 on the classpath alongside Postgres config, it gets confused about which DB Flway should connect to.
+
+
+NB! - Never edit a migration script that has already ran
+--------------------------------------------------------
+
+This is probably the most important Flyway rule!!!
+Once a script has been applied to any environment, it's locked. Flyway stores a checksum of each script-if you edit
+it, the checksum changes and Flyway throws an error on startup.
+
+If you need to change something, create a new migration script.
+
+Naming conventions are important - communicates intent
+-----------------------------------------------------------
+
+V1__init_schema.sql          → initial schema
+V2__init_data.sql            → seed data
+V3__add_role_column.sql      → schema change
+V4__migrate_user_roles.sql   → data migration
+V5__drop_old_column.sql      → cleanup
+
+Good naming conventions allow devs to read and get an idea and purpose of each script.
+
+Separating schema and data migrations
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+It's an important pattern to separate schema and data migrations. We already do it with V1 and V2. It;s important to keep
+then seperate because:
+
+* Schema migrations always run in production
+* Data migrations might be environment-specific - you'd seed test data in dev, not prod
+* Easier to reason about what changed structurally vs what data was loaded
+
+Production migrations need care
+---------------------------------------------------------
+
+Adding a column is safe. Though some operations are dangerous in production:
+* Dropping a column
+* Renaming a column - breaks existing code until deployed
+* Adding a NOT NULL column without a default value - fails if the table has existing data
+
+These require careful sequencing — often called the expand/contract pattern. For example, adding a NOT NULL column:
+
+1. V5__add_new_column_nullable.sql → add column as nullable first
+2. V6__backfill_new_column.sql → populate existing rows
+3. V7__make_column_not_null.sql → then add the constraint
+
+
+
+

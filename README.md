@@ -41,10 +41,6 @@ more production ready features and implementations.
 - More robust Integration tests
 - Introduction of Spring AI
 
-## Reason for missing features and implementations
-The goal was to first set up a foundation and ensure structures were in place in which everything can easily be 
-implemented and integrated. The first goal was focusing on architecture before introducing production features
-
 ## Latest changes
 - Added Spring Security configuration with JWT filter chain
 - Implementation of UserPrincipal, SecurityService, JwtService

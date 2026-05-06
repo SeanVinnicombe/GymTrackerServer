@@ -17,12 +17,7 @@ import java.util.Objects;
 public class ExerciseSession {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "exercise_session_seq")
-    @SequenceGenerator(
-            name = "exercise_session_seq",
-            sequenceName = "exercise_session_seq",
-            allocationSize = 1
-    )
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
 
     @Column(name = "notes")

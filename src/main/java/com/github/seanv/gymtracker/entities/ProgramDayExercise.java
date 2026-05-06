@@ -16,12 +16,7 @@ import java.util.Objects;
 public class ProgramDayExercise {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "program_day_exercise_seq")
-    @SequenceGenerator(
-            name = "program_day_exercise_seq",
-            sequenceName = "program_day_exercise_seq",
-            allocationSize = 1
-    )
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
 
     @Column(name = "exercise_number")

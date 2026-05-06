@@ -18,12 +18,7 @@ import java.util.Set;
 public class ProgramDay {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "program_day_seq")
-    @SequenceGenerator(
-            name = "program_day_seq",
-            sequenceName = "program_day_seq",
-            allocationSize = 1
-    )
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
 
     @Column(name = "muscle_group")
