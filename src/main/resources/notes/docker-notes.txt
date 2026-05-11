@@ -1,0 +1,154 @@
+What is Docker
+==================================
+
+Dokcer is a containerization platform that packages up an application with all its dependencies so the application runs
+quickly and reliably from one computing environment to another. Therefore, there is no need to manually go to each of
+the servers to install and run the application. You already know that the application has everything it needs to run
+and therefore removes the tedious process of setting up the environment.
+
+Two main Concepts:
+
+1. Image - the blueprint. This is a read-only package containing your application code, runtime, dependencies and
+configuration. Think of it as a Java class-it's the definition, not the running thing.
+2.Container - a running instance of the image. Basically an object instantiated from a class. You are able to run
+multiple containers from the same image.
+
+Image (blueprint)  →  Container (running instance)
+    Class          →      Object
+    Recipe         →      Meal
+
+This is important because:
+* You build an image once, and then you can run it any number of times.
+* You can run it anywhere - your laptop, colleagues' machine or a cloud server.
+* You can run 10 containers from the same image simultaneously for scaling.
+
+What is actually happening inside a container?
+-----------------------------------------------------------------
+
+A Container contains:
+* Your application code and compiled artifacts
+* The exact runtime needed (Java 22, for example)
+* All library dependencies
+* Environment configuration
+* Its own filesystem
+* Its own network interface
+
+Though most importantly, it shares host machines OS kernel. This is what makes containers lightweight compared to VMs.
+
+What is the OS Kernel?
+===============================================
+
+Think of OS having two layers:
+
+┌─────────────────────────────────┐
+│         User Space              │
+│  (your apps, Chrome, IntelliJ,  │
+│   terminal, file explorer)      │
+├─────────────────────────────────┤
+│         Kernel Space            │
+│  (the kernel — core of the OS)  │
+├─────────────────────────────────┤
+│         Hardware                │
+│  (CPU, RAM, disk, network card) │
+└─────────────────────────────────┘
+
+The kernel is the core of the OS. It's that software that sits between your applications and the physical hardware.
+It's the first thing that loads when your computer starts and last to shut down.
+
+What does it actually do?
+----------------------------------------
+
+
+
+
+Containers Vs VMs
+==========================================
+
+            VMS                       |          Containers
+-----------------------------------------------------------------------
+         Your app                     |             Your app
+         Guest OS(Full windows/linux) |             Container Runtime only
+         Hypervisor                   |             Host OS Kernel(shared)
+         Host hardware                |             Host hardware
+
+A VM virtualizes the entire machine, including the OS - heavy, slow to start, gigabytes in size.
+
+A container shares the host kernel and only packages what the application actually needs - lightweight, starts in
+seconds, megabytes in size
+
+Think of it like this:
+
+* A VM is like renting an entire apartment - you get your own kitchen, bathroom, everything.
+* A container is like renting a room in a shared house - you get your own space but share the infrastructure
+
+
+The problem Docker solves
+================================================
+
+Without Docker, a new developer needs to:
+
+* Install Java
+* Install PostgreSQL 16 exactly
+* Create the database
+* Setup all the environment variables
+* Hope OS doesn't cause issues
+* Debug for hours when something doesn't match
+
+With Docker:
+
+* Install Docker
+* Run a single command to build and run the application
+
+That's it. The image contains everything. The environment is identical everywhere it runs - your laptop, new
+colleagues machine or cloud server.
+
+How this connects in GymServer
+==================================================
+
+For now, our application needs:
+* Our Spring application
+* PostgreSQL DB
+
+Both live on my machine. With Docker, I'll have:
+
+┌─────────────────────────────────┐
+│         Docker Network          │
+│                                 │
+│  ┌──────────────┐  ┌─────────┐  │
+│  │  Spring Boot │  │ Postgres│  │
+│  │  Container   │  │ SQL     │  │
+│  │              │◄─►Container│  │
+│  └──────────────┘  └─────────┘  │
+└─────────────────────────────────┘
+
+
+Two containers talking to each other on an isolated network - your app completely encapsulated.
+
+When using Docker, will you use 'localhost' for URLs, like for DB?
+=======================================================================
+
+When the Spring Boot application runs inside a container, 'localhsot' refers to those containers itself - not your machine,
+and not the PostgreSQL container. Each container has its own isolated network identity. So 'localhost' from inside the
+Spring Boot container points to nothing useful.
+
+The way containers talk to each other is via service names defined in Docker Compose. For example:
+
+services:
+  app: # your Spring Boot app
+  db: # your PostgreSQL
+
+Docker creates an internal DNS system where each service is reachable by its name. So your Spring Boot container reaches
+PostgreSQL not via 'localhost' but via: "jdbc:postgresql://db:5432/GymTracker" - no 'loalhost'
+
+The service name 'db' resolves to the postgreSQL container's IP address automatically within the Dockers network.
+No need to know actual IP, Docker handles that.
+
+Crucial insight
+---------------------------
+
+Outside Docker  →  localhost:5432      (your machine's PostgreSQL)
+Inside Docker   →  db:5432            (the PostgreSQL container)
+
+This is why we use profiles. For Dev, we would use localhost, for local development. When running in Docker, you will
+use different URL - which means new profile and env variable override.
+
