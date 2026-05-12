@@ -58,6 +58,114 @@ It's the first thing that loads when your computer starts and last to shut down.
 What does it actually do?
 ----------------------------------------
 
+Everything that your application needs from the hardware has to go through the kernel.The kernel decides what memory
+to allocate and where.
+
+* Memory - when your Spring Boot application needs RAM, it asks the kernel. The kernel decides what memory to allocate
+and where.
+
+* CPU scheduling - your machine might have 8 cores but 200 processes running. The kernel decides what processes run on
+which core and for how long. This is important when it comes to threads as the kernel is what actually switches between
+threads
+
+* File system - when you read a file, your code calls something like 'Files.readAllBytes()'. That eventually becomes a
+kernel call that physically reads bytes from the disk.
+
+* Network - when app opens a socket connection to PostgreSQL, the kernel manages the actual networkcoommunication
+
+* Device management - keyboard, mouse, disk, network card - all managed by kernel via drivers.
+
+Application never talks to hardware directly, everything goes through kernel:
+
+                        Your Java code
+                              ↓
+                             JVM
+                              ↓
+                        Operating System APIs
+                              ↓
+                            Kernel
+                              ↓
+                        Physical Hardware
+
+
+Why kernel is important for Docker
+-------------------------------------------
+
+Windows, Linus and macOS all have different kernels. Though Linus containers specifically rely on features built into
+the Linux kernel called:
+
+* namespaces - what gives each container its own isolated view of the system
+(its own filesystem, network and its own process list)
+
+* cgroups(control groups) - limits the resources(CPU/memory) that a container can use.
+
+When Docker runs a container, it's not running a separate OS. It's using these Linux kernel features to create an
+isolated slice of the existing kernel.
+
+                            Container A         Container B
+                            ────────────        ────────────
+                            App A               App B
+                            Its own filesystem  Its own filesystem
+                            Its own network     Its own network
+                                    ↓                   ↓
+                                Shared Linux Kernel
+                                    ↓
+                                Hardware
+
+Both containers share the same kernel, but each thinks it has its own isolated environment. That is the magic - and why
+containers are lightweight. There is no need to boot up a second OS, no second kernel to load. Just isolated processes
+running on the same kernel.
+
+Why VMs are different
+--------------------------------------
+
+A VM uses a hypervisor to simulate an entire computer - including a full hardware layer. Each VM runs its own complete
+OS with its own kernel
+
+                            VM A                    VM B
+                            ────────────            ────────────
+                            App A                   App B
+                            Guest OS + Kernel A     Guest OS + Kernel B
+                                    ↓                       ↓
+                                Hypervisor (simulates hardware for each VM)
+                                    ↓
+                                Host OS + Kernel
+                                    ↓
+                                Hardware
+
+
+This is the reason VMs are heavy - gigabytes of disk space, minutes to boot, significant memory overhead. You are
+literally running two complete operating systems. Containers skip all this by sharing the host kernel.
+
+The Windows/Mac complication
+----------------------------------------
+
+Since Docker is built on top of Linux container technology and Linux containers need Linux kernel features, how do i run
+it on Windows or Mac?
+
+DockerDesktop on Windows/Mac actually runs a lightweight Linux VM in the background - just enough to provide a Linux
+kernel for the containers to use. You never see it, but it's there. That's why Docker Desktop uses more memory than
+you might expect.
+
+This is also why there are both Linux containers and Windows containers - they need different kernels.
+
+How kernel links to code
+----------------------------------------
+
+When working with SecurityContext, it's the kernel that actually manages those threads. When Spring Boot creates a
+thread pool to handle HTTP requests, it's asking the Linux kernel to create and schedule those threads. The kernel's
+thread scheduler is what actually switches between threads on the CPU.
+
+And when the JWT filter runs on a thread - the kernel is what gives that thread its isolated stack frame where local
+variables live. The heap where your singleton beans live is managed by the JVM, which sits on the kernel.
+
+                            Your JWT filter code (local variables on stack)
+                                    ↓
+                            JVM (manages heap, garbage collection)
+                                    ↓
+                            Linux Kernel (manages threads, memory, network)
+                                    ↓
+                            Hardware (CPU executes instructions, RAM stores data)
 
 
 
