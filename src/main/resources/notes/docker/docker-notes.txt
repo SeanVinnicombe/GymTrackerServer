@@ -8,7 +8,7 @@ and therefore removes the tedious process of setting up the environment.
 
 Two main Concepts:
 
-1. Image - the blueprint. This is a read-only package containing your application code, runtime, dependencies and
+1. Image - the blueprint. This is a read-only package containing your application code, runtime, dependencies, and
 configuration. Think of it as a Java class-it's the definition, not the running thing.
 2.Container - a running instance of the image. Basically an object instantiated from a class. You are able to run
 multiple containers from the same image.
@@ -19,7 +19,7 @@ Image (blueprint)  →  Container (running instance)
 
 This is important because:
 * You build an image once, and then you can run it any number of times.
-* You can run it anywhere - your laptop, colleagues' machine or a cloud server.
+* You can run it anywhere - your laptop, colleagues' machine, or a cloud server.
 * You can run 10 containers from the same image simultaneously for scaling.
 
 What is actually happening inside a container?
@@ -40,17 +40,17 @@ What is the OS Kernel?
 
 Think of OS having two layers:
 
-┌─────────────────────────────────┐
-│         User Space              │
-│  (your apps, Chrome, IntelliJ,  │
-│   terminal, file explorer)      │
-├─────────────────────────────────┤
-│         Kernel Space            │
-│  (the kernel — core of the OS)  │
-├─────────────────────────────────┤
-│         Hardware                │
-│  (CPU, RAM, disk, network card) │
-└─────────────────────────────────┘
+                    ┌─────────────────────────────────┐
+                    │         User Space              │
+                    │  (your apps, Chrome, IntelliJ,  │
+                    │   terminal, file explorer)      │
+                    ├─────────────────────────────────┤
+                    │         Kernel Space            │
+                    │  (the kernel — core of the OS)  │
+                    ├─────────────────────────────────┤
+                    │         Hardware                │
+                    │  (CPU, RAM, disk, network card) │
+                    └─────────────────────────────────┘
 
 The kernel is the core of the OS. It's that software that sits between your applications and the physical hardware.
 It's the first thing that loads when your computer starts and last to shut down.
@@ -77,25 +77,25 @@ kernel call that physically reads bytes from the disk.
 
 Application never talks to hardware directly, everything goes through kernel:
 
-                        Your Java code
-                              ↓
-                             JVM
-                              ↓
-                        Operating System APIs
-                              ↓
-                            Kernel
-                              ↓
-                        Physical Hardware
+                                Your Java code
+                                      ↓
+                                     JVM
+                                      ↓
+                                Operating System APIs
+                                      ↓
+                                    Kernel
+                                      ↓
+                                Physical Hardware
 
 
 Why kernel is important for Docker
 -------------------------------------------
 
-Windows, Linus and macOS all have different kernels. Though Linus containers specifically rely on features built into
+Windows, Linus, and macOS all have different kernels. Though Linus containers specifically rely on features built into
 the Linux kernel called:
 
 * namespaces - what gives each container its own isolated view of the system
-(its own filesystem, network and its own process list)
+(its own filesystem, network, and its own process list)
 
 * cgroups(control groups) - limits the resources(CPU/memory) that a container can use.
 
@@ -208,7 +208,7 @@ With Docker:
 * Run a single command to build and run the application
 
 That's it. The image contains everything. The environment is identical everywhere it runs - your laptop, new
-colleagues machine or cloud server.
+colleagues machine, or cloud server.
 
 How this connects in GymServer
 ==================================================
@@ -259,4 +259,67 @@ Inside Docker   →  db:5432            (the PostgreSQL container)
 
 This is why we use profiles. For Dev, we would use localhost, for local development. When running in Docker, you will
 use different URL - which means new profile and env variable override.
+
+Locating and using other service in Docker instance
+==============================================================
+
+When you define services in Docker Compose, Docker creates an internal DNS where each service is reachable simply by
+its service name. Docker automatically assigns an IP address to containers internally and maps the service name to
+that IP.
+
+So if you have a service called 'db' in your Docker Compose file: "jdbc:postgresql://db:5432/GymTracker"
+
+Docker sees 'db', looks up which container has that service name, finds its internal IP, and routes the connection.
+The IP could be '172.18.0.2' or anything. The name is stable, the IP changes.
+
+Like when using the internet, we type 'google.com' and the DNS system resolves it to '172.16.31.10'
+
+What Docker does conceptually
+===========================================
+
+A Dockerfile is a recipe for creating a Docker image. Each line is an instruction to the Docker daemon:
+
+* FROM - start from the base image (like "start with Java 17 already installed")
+* RUN - run a command during the build process
+* COPY - copy files from the host machine into the image
+* EXPOSE - documents the port that the container will listen to on
+* ENV - set environment variable
+* CMD - set command to run when the container starts
+* ADD - copy files from URL to container
+* VOLUME - mount a volume
+* WORKDIR - set working directory
+* LABEL - add metadata to an image
+
+So Dockerfile will essentially say:
+
+- Start with Java 17
+- Run a command to install Maven
+- Copy the project files into the image
+- Expose port 8080
+- Set environment variable
+- Set the command to run when the container starts
+- Add a volume
+- Set the working directory
+- Add a label
+
+How to build Docker image
+=====================================
+
+In the terminal of the project root folder run the following command: 'docker build -t gymserver .'
+
+* 'docker build' - builds the image
+* '-t' - assigns a name to the image
+* 'gymserver' - name of the image
+* ' .' - path to the folder containing the Dockerfile
+
+Docker will pull the 'eclipse-temurin:17-jre-focal' base image from Docker Hub if it doesnt't have it locally
+and build the image from there.
+
+
+
+
+
+
+
+
 

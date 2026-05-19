@@ -3,6 +3,8 @@ package com.github.seanv.gymtracker.unit.controller;
 import com.github.seanv.gymtracker.controllers.UserController;
 import com.github.seanv.gymtracker.dto.ProgramDto;
 import com.github.seanv.gymtracker.exception.type.UserNotFoundException;
+import com.github.seanv.gymtracker.security.JwtService;
+import com.github.seanv.gymtracker.security.SecurityService;
 import com.github.seanv.gymtracker.services.ProgramService;
 import com.github.seanv.gymtracker.services.UserService;
 import org.junit.jupiter.api.Test;
@@ -28,6 +30,14 @@ public class UserControllerUnitTest {
 
     @MockitoBean
     private UserService userService;
+
+    @MockitoBean
+    private JwtService jwtService;
+
+    @MockitoBean
+    private SecurityService securityService;
+
+    //TODO fix tests with now added Spring Security functionality
 
     @MockitoBean
     ProgramService programService;

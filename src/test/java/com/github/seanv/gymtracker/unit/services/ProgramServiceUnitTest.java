@@ -64,6 +64,8 @@ public class ProgramServiceUnitTest {
 
     }
 
+    //TODO fix Null pointer exception - weeks functionality hasnt been incorporated into tests
+
     @Test
     void when_getting_program_by_id_return_valid_program_dto(){
 

@@ -1,0 +1,93 @@
+What is docker-compose
+================================
+docker-compose-yml is where everything connects together. This file belongs in root folder alongside dockerfile.
+
+Things to configure in docker-compose.yml:
+---------------------------------------------
+
+* What image each service uses
+* Environment variables for each service
+* Which ports to expose to your host machine
+* A shared network so they can talk to each other
+* A volume for PostgresSQL so data persists when container restarts
+
+Using environment variables in docker-compose.yml
+====================================================
+
+When setting up docker environment and configure variables, there area couple options to use:
+
+* Option A - Create a 'docker' profile: A dedicated 'application-docker.properties' that has Docker specific config.
+Clean separation. Very explicit.
+
+*Option B - Use environment variable overrides in docker-compose.yml: Keep your existing profiles and override specific
+properties via environment variables in the compose file. Spring Boot lets environment variables override any
+property at runtime.
+
+* Option C - Use prod profile with Docker specific env variables: Use 'application-prod.properties' but pass Docker
+specific values through Docker Compose environment variables.
+
+Which approach is best?
+----------------------------------------------
+
+Option B is the best approach. The key reasoning is "Properties files define the structure and defaults. Environment
+variables provide the actual sensitive values at runtime, regardless of environment."
+
+This is called externalization configuration and its a core twelve factor principle. These are best practices for
+building production ready applications
+
+How Spring Boot property override works
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Spring Boot has a priority order for configuration. From highest to lowest priority:
+
+1. Environment variables          ← highest, always wins
+2. application-{profile}.properties
+3. application.properties         ← lowest priority
+
+
+So if application-dev.properties says: "spring.datasource.url=${DB_URL_DEV}"
+
+And Docker Compose passes in: "DB_URL_DEV=jdbc:postgresql://localhost:5432/mydb"
+
+Spring Boot uses the Docker compose value. If you run locally without Docker, Intellij's run configuration provides the
+values instead. Same property file, different values injected depending on environment.
+
+Structure of docker-compose file
+============================================
+
+Example:
+
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: GymTracker
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - gymtracker_data:/var/lib/postgresql/data
+    networks:
+      - gymtracker_network
+
+  app:
+    build: .
+    ports:
+      - "8087:8087"
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      DB_URL_DEV: jdbc:postgresql://db:5432/GymTracker
+      DB_USERNAME_DEV: postgres
+      DB_PASSWORD_DEV: postgres
+      JWT_SECRET_DEV: ${JWT_SECRET_DEV}
+    depends_on:
+      - db
+    networks:
+      - gymtracker_network
+
+volumes:
+  gymtracker_data:
+
+networks:
+  gymtracker_network:

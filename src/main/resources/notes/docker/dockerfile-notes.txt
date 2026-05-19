@@ -1,0 +1,17 @@
+Dockerfile breakdown
+==================================
+
+* FROM eclipse-temurin:17-jre-alpine - start from existing image that already has java 17 installed. 'eclipse-temurin'
+ is the official OpenJDK distribution. 'alpine' means it's based on the Alpine Linux - a very small Linux distribution,
+ which keeps images small and fast. We use jre and not jdk because we only running Java, we don't need to compile it.
+
+* WORKDIR /app - sets the working directory inside the container. All subsequent commands run from here.
+
+* COPY target/GymTracker.jar app.jar - copies the jar file from the target folder to the container and renaming it as
+'app.jar'
+
+* EXPOSE 8089 - documents that the container will listen on port 8089. This doesn't actually open the port - it's
+documentation for Docker Compose to use. Also needs to match port in application.properties
+
+* ENTRYPOINT ["java","-jar","app.jar"] - command that runs when container starts. Basically what you would type in the
+terminal to run the app.
