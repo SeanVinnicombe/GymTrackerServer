@@ -1,0 +1,35 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: GymTracker
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - gymtracker_data:/var/lib/postgresql/data
+    networks:
+      - gymtracker_network
+
+  app:
+    build: .
+    restart: on-failure
+    ports:
+      - "8087:8087"
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      DB_URL_DEV: jdbc:postgresql://db:5432/GymTracker
+      DB_USERNAME_DEV: postgres
+      DB_PASSWORD_DEV: postgres
+      JWT_SECRET_DEV: ${JWT_SECRET_DEV}
+    depends_on:
+      - db
+    networks:
+      - gymtracker_network
+
+volumes:
+  gymtracker_data:
+
+networks:
+  gymtracker_network:

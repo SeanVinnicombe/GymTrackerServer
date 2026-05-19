@@ -73,6 +73,7 @@ services:
 
   app:
     build: .
+    restart: on-failure
     ports:
       - "8087:8087"
     environment:
@@ -91,3 +92,74 @@ volumes:
 
 networks:
   gymtracker_network:
+
+
+volumes
+------------------------
+
+A volume is a persistent storage that exists outside the containers lifecycle.
+
+This has to do when container stops or gets deleted- everything inside it disappears. That is the problem with databases
+in containers. If your PostgresSql container restarts, you lose all your data.
+
+aVolume solves this by storing data on your host machines filesystem and mounting it into the container. The container
+reads and writes to it like a normal folder, but the data lives on your host machine - not inside the container.
+
+                                Host machine disk          Docker container
+                                ──────────────────         ─────────────────
+                                gymtracker_data    ←─────→ /var/lib/postgresql/data
+                                (persists forever)         (PostgreSQL stores data here)
+
+Container deleted -> data survives because it's on your host machine.
+
+
+depends_on
+---------------------------
+
+Declares dependencies between services. Important that if a service is dependent on another, that service must be declared
+before it.
+
+'depends_on' only waits for container to start up - not for the service inside it to be ready. PostgresSQL takes a few
+seconds to initialize.] after the container starts. Your Spring Boot app might start before PostreSQL is actually
+accepting connections, causing a connection error.
+
+The proper fix is a health check - but for now ' depends_on' is fine
+
+We also add 'restart: on-failure' to the app service as this means if the app container fails to start because db isn't
+ready yet, docker will restart it.
+
+networks
+------------------------------
+
+Docker creates an isolated internal network. Services on the same network can reach each other by service name.
+Services on different networks cannot communicate at all - isolation by default. This is why both services must be
+on 'gymtracker_network'
+
+'build .' vs 'image:'
+-------------------------------
+
+* 'image: postgres:16-alpine' - tells Docker to pull an existing pre built image from Docker hub - PostgresSQL is a well
+known image that already exists publicly.
+* 'build:' tells Docker to build a new image from your Dockerfile in the current directory - because your Spring Boot
+app is custom code, no pre built image exists
+
+Why "${JWT_SECRET_DEV}" is used and value isn't hardcoded
+-----------------------------------------------------------
+
+"${JWT_SECRET_DEV}" syntax in docker-compose.yml means Docker Compose reads this value from a '.env' file in the same
+directory, or from your shells environment variables.
+
+So the flow is;
+
+.env file
+JWT_SECRET_DEV=yourBase64EncodedSecret
+        ↓
+docker-compose.yml reads it
+JWT_SECRET_DEV: ${JWT_SECRET_DEV}
+        ↓
+Passes it into the container as an environment variable
+        ↓
+Spring Boot reads it via ${JWT_SECRET_DEV} in application-dev.properties
+
+This is why it is not hardcoded - the .env file gets added to '.gitignore' so it is not committed to Git.
+Docker Compose reads it locally, Spring Boot reads it inside the container.
