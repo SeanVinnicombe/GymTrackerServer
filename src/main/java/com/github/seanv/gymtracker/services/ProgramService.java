@@ -1,28 +1,27 @@
 package com.github.seanv.gymtracker.services;
 
 import com.github.seanv.gymtracker.dto.ProgramDayDto;
-import com.github.seanv.gymtracker.dto.ProgramDayExerciseDto;
 import com.github.seanv.gymtracker.dto.ProgramDto;
 import com.github.seanv.gymtracker.dto.ProgramWeekDto;
 import com.github.seanv.gymtracker.dto.input.ProgramDayExerciseInputDto;
 import com.github.seanv.gymtracker.dto.input.ProgramDayInputDto;
 import com.github.seanv.gymtracker.dto.input.ProgramInputDto;
-import com.github.seanv.gymtracker.dto.input.ProgramWeekInputDto;
 import com.github.seanv.gymtracker.entities.*;
 import com.github.seanv.gymtracker.exception.type.ProgramNotFoundException;
 import com.github.seanv.gymtracker.mappers.ExerciseMapper;
-import com.github.seanv.gymtracker.mappers.ProgramDayMapper;
 import com.github.seanv.gymtracker.mappers.ProgramMapper;
 import com.github.seanv.gymtracker.mappers.UserMapper;
 import com.github.seanv.gymtracker.repositories.ProgramRepository;
+import com.github.seanv.gymtracker.security.UserPrincipal;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
+import java.util.Objects;
 
 @Service
 public class ProgramService {
@@ -59,46 +58,57 @@ public class ProgramService {
 
     /**
      * When retrieving Program, db calls were split up otherwise it would have resulted in nested collections
-     * having to be retried in one call, which is overkill which kills performance and could lead to
+     * having to be retried in one call, which is overkill that kills performance and could lead to
      * Cartesian Product Explosion
      * **/
+    @Transactional
     public ProgramDto getProgram(Long id){
-        var m = mapper.toDto(programRepository.findById(id).orElseThrow(() -> new ProgramNotFoundException(id)));
-        m.setProgramWeeks(getProgramWeeks(m.getId()));
-        return m;
+        Program program = programRepository.findByIdWithProgramWeeks(id).orElseThrow(() -> new ProgramNotFoundException(id));
+        return mapper.toDto(program);
     }
 
     /**
      * (() -> new ProgramNotFoundException(id)) lambda is used as orElseThrow expects Supplier.get() which expects no args,
      * so we have to wrap in lambda as it needs an arg for exception.
      *
-     * if exception didn't take in args we would use RuntimeException::new
+     * if exception didn't take in args, we would use RuntimeException::new
      *
-     * NB! - we cant use new RuntimeException() as it would create exception even if value exists, that's why we use
-     * ()-> new RuntimeException to only create exception when its needed
+     * NB! - we can't use new RuntimeException() as it would create an exception even if the value exists, that's why we use
+     * ()-> new RuntimeException to only create an exception when it's needed
      * */
 
+
+    /**
+     * So we use @Transactional here, because we need session to stay open, even whilst mapping happens because without
+     *  it, we would be hit with LazyLoadingException as we are trying to load a collection that is not yet loaded(programWeeks)
+     *
+     *  So using @Transactional wraps the entire method into a single transaction - keeping the session open until the method
+     *  returns. Now the mapper can access Lazy collections as the session is still open and doesn't close after db call
+     *  and before mapping happens
+     */
+
+    @Transactional
     public List<ProgramDto> getAllPrograms(){
-        var a =  programRepository.findAll();
-        return a.stream().map(mapper::toDto).toList();
+        var holder = SecurityContextHolder.getContext();
+        UserPrincipal principal = (UserPrincipal) Objects.requireNonNull(holder.getAuthentication()).getPrincipal();
+        assert principal != null;
+        String email = principal.getUsername();
+        Long userId = userService.getUserIdByEmail(email);
+        List<Program> programs =  programRepository.getAllProgramsByUser_Id(userId);
+        return programs.stream().map(mapper::toDto).toList();
     }
+
+    /**
+     * Instead of using passed param to get all programs for a specific user, we make use of the SecurityContext to
+     * extract the necessary user info for us to make the call. This is better than having the user id used in the url
+     * as a user could change the id and view other user programs. The issue that this method solves is
+     * Insecure Direct Object Reference(IDOR) - one of the most common API vulnerabilities. You would need to check id
+     * in url against the one in context, but the above approach of not using url and just extracting the id from
+     * SecurityContext is better
+     */
 
     public List<ProgramDayDto> getProgramDays(Long programId){
         return programDayService.getProgramDaysByProgramId(programId);
-    }
-
-    public List<ProgramWeekDto> getProgramWeeks(Long programId){
-        return programWeekService.getProgramWeeksByProgramId(programId);
-    }
-
-    public List<ProgramDto> getAllProgramsByUserId(Long userId){
-        userService.getUser(userId);
-        var list = programRepository.getAllProgramsByUser_Id(userId).stream().map(mapper::toDto).toList();
-        list.forEach( i -> {
-            i.setProgramWeeks(getProgramWeeks(i.getId()));
-        });
-
-        return list;
     }
 
     @Transactional

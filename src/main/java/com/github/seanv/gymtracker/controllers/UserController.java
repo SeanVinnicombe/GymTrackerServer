@@ -36,20 +36,4 @@ public class UserController {
         this.userService = userService;
         this.programService = programService;
     }
-
-    @Operation(description = "Find all Programs by specific User Id")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Programs found for specific User",
-                    content = @Content(mediaType = "application.json",
-                            schema = @Schema(implementation = ProgramsResponse.class))),
-            @ApiResponse(responseCode = "500", description = "Something went wrong...",
-                    content = @Content(mediaType = "application.json",
-                            schema = @Schema(implementation = ApiError.class)))
-    })
-    @GetMapping("/{id}/programs")
-    public ResponseEntity<ProgramsResponse> getProgramsByUser(@PathVariable Long id) {
-        List<ProgramDto> programs = programService.getAllProgramsByUserId(id);
-        var response = new ProgramsResponse(programs);
-        return ResponseEntity.ok(response);
-    }
 }
