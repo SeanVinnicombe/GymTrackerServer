@@ -15,3 +15,225 @@ documentation for Docker Compose to use. Also needs to match port in application
 
 * ENTRYPOINT ["java","-jar","app.jar"] - command that runs when container starts. Basically what you would type in the
 terminal to run the app.
+
+Multi-Stage Builds
+============================================
+
+
+# ==================== Stage 1: Build ==================
+
+FROM maven:3.9-eclipse-temurin-17-alpine AS builder
+
+WORKDIR /app
+
+# Copy pom.xml first - dependecies change less frequent than src code
+# This allows Docker to cache dependecy download layer
+COPY pom.xml .
+RUN mvn dependency:go-offline -B
+
+# Copy source code build
+Copy src ./src
+RUN mvn clean package -DskipTests -B
+
+# ====================== Stage 2: Run ===================
+
+FROM eclipse-temurin:17-jre-alpine
+
+# Create a non-root user for security - never run containers as root
+Run addgroup -S gymtracker && adduser -S gymtracker -G gymtracker
+
+WORKDIR /app
+
+# Copy only the JAR from the builder stage - nothing else comes across
+COPY --from=builder /app/target/GymTracker.jar app.jar
+
+# Change ownership of app files to non-root user
+RUN chown -R gymtracker:gymtracker /app
+
+# Switch to non-root user
+USER gymtracker
+
+EXPOSE 8087
+
+ENTRYPOINT ["java", "-jar", "app.jar"]
+
+
+'AS builder'
+----------------------------------
+
+'AS builder' gives this stage a name. It is creating a named reference you can use later in the docker file.
+Without the name you won't be able to reference this stage in subsequent stages. The name 'builder' is also just a
+convention, it can be anything you want. It is basically assigning a variable name to a stage so you can use it later.
+
+'COPY --from=builder'
+-----------------------------------
+
+This is used for copying files from previous stage filesystem.
+
+Each stage in a multi-stage build has its own completely isolated filesystem. When stage 1(builder) runs
+'mvn clean package', it produces 'GymTracker.jar' in its own filesystem at '/app/target/GymTracker.jar'
+
+Stage 2 is a completely fresh filesystem - it has no idea what stage 1 did. 'COPY --from=builder' is how stage 2 reaches
+into stage 1's filesystem and pulls out specific files.
+
+Stage 1 filesystem          Stage 2 filesystem
+──────────────────          ──────────────────
+/app/pom.xml                (empty to start)
+/app/src/...
+/app/target/GymTracker.jar ──COPY──→ /app/app.jar
+Maven, JDK (NOT copied)     JRE only
+
+Crucially - only the files you explicitly copy come across. Maven, the JDK, source code, test files - all left behind
+in Stage 1. They never end up in final image.
+
+Why do we COPY pom.xml . separately before COPY src ./src?
+---------------------------------------------------------------
+
+This has to do with layer caching.
+
+Every instruction in a Dockerfile creates a layer. Docker caches these layers. If nothing changed that would affect a
+layer, Docker reuses the cached version instead of rebuilding it - saving potential minutes on build times.
+
+The key rule is: "When a layer changes, all subsequent layers must be rebuilt"
+
+Example:
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+COPY pom.xml .                    # Layer A
+RUN mvn dependency:go-offline     # Layer B - downloads all dependencies
+COPY src ./src                    # Layer C
+RUN mvn clean package -DskipTests # Layer D - compiles your code
+
+src frequently changes as you are constantly making changes to code, where as the pom.xml rarely ever gets changed.
+Downloading the Maven dependencies also take the longest as its potentially hundreds of MBs that needs to be downloaded.
+So by copying 'pom.xml' first and then downloading dependencies as a separate layer - that layer gets cached. So next time
+you build and only changed the source code:
+
+COPY pom.xml .          → pom.xml unchanged → use cache ✅ (instant)
+RUN mvn dependency:...  → dependencies unchanged → use cache ✅ (instant, saves minutes)
+COPY src ./src          → source changed → rebuild ❌ (must rerun)
+RUN mvn package         → must rerun ❌
+
+vs if you copied everything together:
+
+COPY . .                → source changed → cache invalidated ❌
+RUN mvn package         → downloads ALL dependencies again ❌ (minutes wasted)
+
+The ordering of COPY instructions is a deliberate performance optimization - copy things that change least frequently
+first.
+
+So in interview when asked - "How do you optimize Docker build times for a Java application?"
+The answer is exactly this - layer caching by separating dependency download from source compilation.
+
+'-B' Flag
+--------------------------------------------------------
+
+'-B' stands for batch mode.
+
+In normal mode Maven outputs interactive progress indicators, colour coding and download progress bars - designed for a
+human watching a terminal.  In a CI/CD pipline or Docker build ther is no humans watching and those interactive elements:
+
+* Clutter build logs
+* Can cause issues with some logging systems that don't handle interactive output well
+* Slightly slow down the build
+
+Batch mode tells Maven - "you are running in an automated environment, output plain text logs only, no interactive
+elements"
+
+Using '-B' is a professional touch that's signals, you understand automated build environments.
+
+Why you should never run containers as root?
+-----------------------------------------------------------
+
+By default, Docker containers run as root - the most privileged user on  a Linux system. This means Root as unrestricted
+access to everything the kernel manages.
+
+If an attacker exploits a vulnerability in spring Boot application - a remote code execution bug for example - they gain
+ the ability to run arbitrary commands inside your container. If that process runs as root:
+
+ Attacker exploits vulnerability
+         ↓
+ Gains code execution as root inside container
+         ↓
+ Can read all files including secrets
+ Can modify system files
+ Can potentially escape the container via kernel exploits
+ Can install malicious software
+ Can access other containers on the same host
+
+If the process runs as a non-root user 'gymtracker':
+
+Attacker exploits vulnerability
+        ↓
+Gains code execution as gymtracker user
+        ↓
+Can only access files gymtracker owns
+Cannot modify system files
+Cannot install software
+Significantly limited blast radius
+
+This is the principle of least privilege applied to containers - a process should only have the minimum permissions needed
+to do its job. Our Spring Boot application only needs to read its JAR file and make network connections. It does not need
+root privileges.
+
+Important in fintech spaces!
+
+'chown'
+---------------------------------
+
+'chown' stands for change of ownership. It's a Linux command that changes who owns a file or directory.
+
+The syntax is: "chown -R owner:group path"
+
+* '-R' - recursive, applies to all files and subdirectories.
+* 'owner:group' - the new owner and group
+* 'path' - what to change ownership to
+
+Therefore:
+
+RUN chown -R gymtracker:gymtracker /app
+
+Changes ownership of everything in /app to the 'gymtracker' user and 'gymtracker' group
+
+Why is this necessary?
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+When you run "COPY --from=builder /app/target/GymTracker.jar app.jar" as part of the Docker build, the file is created
+and owned by roo - because the build process runs as root.
+
+If you then switch to the 'gymtracker' user with 'USER gymtracker', that user can't read a file owned by root - permission
+denied. Your application would fail to start.
+
+So the sequence is:
+
+COPY --from=builder /app/target/GymTracker.jar app.jar  # root owns this file
+RUN chown -R gymtracker:gymtracker /app                  # transfer ownership
+USER gymtracker                                           # switch to non-root
+ENTRYPOINT ["java", "-jar", "app.jar"]                   # gymtracker can now read it
+
+Think of it like this — if a file belongs to your colleague, you can't read it without their permission. 'chown'
+transfers the file to you so you can access it.
+
+Linux file permissions
+===========================================
+
+Since we are working with Linux and Docker, we will encounter these.
+
+Every file in Linux has three permission sets:
+
+Owner    Group    Others
+rwx      rwx      rwx
+
+* r — read
+* w — write
+* x — execute
+
+When you do ls -la in a Linux terminal you see something like: "-rw-r--r-- 1 gymtracker gymtracker 45M app.jar"
+
+This means:
+
+* Owner (gymtracker) → read + write
+* Group (gymtracker) → read only
+* Others → read only
+
+
