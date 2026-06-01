@@ -1,0 +1,151 @@
+What is Spring Actuator?
+=====================================
+
+Actuator is a Spring Boot module that exposes operational endpoints about your running application. Basically a window
+into your applications health and internals.
+
+Out of the box it provides endpoints like:
+
+* /actuator/health    → is the application healthy?
+* /actuator/info      → application metadata
+* /actuator/metrics   → performance metrics (memory, CPU, requests)
+* /actuator/env       → current environment and properties
+* /actuator/beans     → all Spring beans registered
+
+Why does this matter  with something like Docker?
+---------------------------------------------------------
+
+Docker and Kubernetes need a way to ask your application " are you alive and healthy?". They can't just assume the
+container is healthy because it is running - the JVM might be up but the DB connection could be broken, meaning the
+app running is useless.
+
+Actuator's '/actuator/health' endpoint answer that question:
+
+{
+  "status": "UP",
+  "components": {
+    "db": {
+      "status": "UP"
+    },
+    "diskSpace": {
+      "status": "UP"
+    }
+  }
+}
+
+If the DB connection drops - status becomes "DOWN". Docker and Kubernetes see this and can restart the container
+automatically.
+
+Dealing with Security with Actuator
+=================================================
+
+The standard approach for Actuator Security:
+--------------------------------------------------
+
+'/actuator/health' - need to be public so Docker and Kubernetes health checks can reach it without authentication. A
+health check can't log in first.
+
+All other Actuator endpoints should be either:
+
+* Restricted to 'ROLE_ADMIN' only
+* Or disabled entirely if not needed
+
+This means Security config needs updating with new lines:
+
+.requestMatchers("/actuator/health").permitAll()    // Docker needs this
+.requestMatchers("/actuator/**").hasRole("ADMIN")   // everything else admin only
+
+Actuator exposure
+------------------------------
+
+By default, with Spring Boot 3+ exposes '/health' endpoint over HTTP. You have to explicitly enable others. The following
+is needed in application.properties:
+
+# Only expose health endpoint over HTTP
+management.endpoints.web.exposure.include=health
+management.endpoint.health.show-details=when-authorized
+
+'show-details=when-authorized' means:
+
+* Unauthenticated requests see just {"status": "UP"}
+* Authenticated admin users see full details including DB status
+
+Docker gets simple UP/DOWN. Admin gets full access.
+
+Why ordering matters in SecurityConfig?
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+In Spring, the first match always wins, Spring Security evaluates rules top to bottom and stops at the first match. If
+'actuator/**' requiring role "ADMIN" comes first, every actuator request including 'actuator/halth' matches that rule and
+gets blocked before permit rule is ever reached.
+
+The more specific rule comes before the more general one.
+
+
+Adding Actuator to Dockerfile
+======================================
+
+Following lines need to be added to Dockerfile:
+
+HEALTHCHECK --interval=30s --timeout=3s --retries=3 \
+  CMD wget --quiet --tries=1 --spider \
+  http://localhost:8087/actuator/health || exit 1
+
+What do they mean?
+---------------------------------------
+
+* interval - check status every 30 seconds
+* timeout - if no feedback after 3 seconds, retry
+* retries - you have 3 attempts to get status otherwise entire process is shutdown
+
+* CMD - command line prompt
+* wget - is a Linux command line tool for making HTTP requests
+* --quiet - no output, don't print response body
+* --tries=1 - only attempt once(Dockers '--retires' handles retry logic)
+* --spider - just check if URL is reachable, don't download the content.
+* http://localhost:8087/actuator/health - the endpoint to check
+
+So this basically says " Make a lightweight HTTP request to the health endpoint and see if it responds."
+
+"|| exit 1"
+~~~~~~~~~~~~~~~~~~~~~~
+
+'||' is shell operator meaning "OR" - if the previous command fails, run this command.
+
+'exit 1' tells the shell to exit with status code 1 - which means failure
+
+in Linux exit codes matter:
+
+* exit 0 → success
+* exit 1 → failure
+
+Docker reads the exit code of your health check command:
+
+Returns 0 → container is healthy ✅
+Returns 1 → container is unhealthy ❌
+
+So || exit 1 means — if wget fails to reach the endpoint, explicitly signal failure to Docker.
+
+The full health check
+=====================================
+
+Container starts
+      ↓
+Wait 30 seconds (first interval)
+      ↓
+Run health check
+      ↓
+├── Success → healthy, check again in 30s
+└── Failure → retry
+          ↓
+     Retry 1 fails
+          ↓
+     Retry 2 fails
+          ↓
+     Retry 3 fails
+          ↓
+     Container marked UNHEALTHY
+     Docker can restart it automatically
+
+Important to not make interval time too short as everything in application needs to start up and initialize and so if
+you set it too short, Docker might mark container as unhealthy before its even finished starting up.

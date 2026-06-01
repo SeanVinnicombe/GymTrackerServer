@@ -1,0 +1,20 @@
+services:
+  db:
+    ports:
+      - "5432:5432" # expose DB port locally for DBeaver access
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+
+  app:
+    build: .
+    restart: on-failure
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      DB_URL_DEV: jdbc:postgresql://db:5432/GymTracker
+      DB_USERNAME_DEV: postgres
+      DB_PASSWORD_DEV: postgres
+      JWT_SECRET_DEV: ${JWT_SECRET_DEV}
+
+
+# This file is gitignore because it contains sensitive data

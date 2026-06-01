@@ -11,7 +11,7 @@ COPY pom.xml .
 RUN mvn dependency:go-offline -B
 
 # Copy source code build
-Copy src ./src
+COPY src ./src
 RUN mvn clean package -DskipTests -B
 
 # ====================== Stage 2: Run ===================
@@ -33,5 +33,9 @@ RUN chown -R gymtracker:gymtracker /app
 USER gymtracker
 
 EXPOSE 8087
+
+HEALTHCHECK --interval=30s --timeout=3s --retries=3 \
+    CMD wget --quiet --tries=1 --spider \
+    http://localhost:8087/actuator/health || exit 1
 
 ENTRYPOINT ["java", "-jar", "app.jar"]

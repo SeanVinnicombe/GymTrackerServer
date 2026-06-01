@@ -163,3 +163,112 @@ Spring Boot reads it via ${JWT_SECRET_DEV} in application-dev.properties
 
 This is why it is not hardcoded - the .env file gets added to '.gitignore' so it is not committed to Git.
 Docker Compose reads it locally, Spring Boot reads it inside the container.
+
+
+docker-compose for different profiles
+==============================================
+
+Running a full Maven build inside Docker on every 'docker-compose up --build' is slow for local development.
+
+The solution most teams use is two separate compose files:
+
+* docker-compose.yml          → base config, shared between environments
+* docker-compose.override.yml → local dev overrides, gitignore
+* docker-compose.prod.yml     → production specific config
+
+For local development 'docker-compose.override.yml' would use your pre built JAR:
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+
+
+Where Dockerfile.dev is a simple single stage Dockerfile that just copies your pre built JAR - fast for development.
+
+For production 'docker-compose.prod.yml' uses the full multi staged build.
+
+
+Why docker-compose.override.yml specifically?
+---------------------------------------------------------
+
+This is not just a naming convention - its a Docker compose built in feature. when you run 'docker-compose up', Docker
+Compose automatically looks for and merges two files in order:
+
+1. docker-compose.yml        → always loaded
+2. docker-compose.override.yml → automatically loaded if it exists
+
+Docker finds override automatically and merges it on top of the base file,you don't need to specify anything. The override
+files values win when there is a conflict.
+
+This is why its called 'override' - it's Docker Compose native mechanism for layering config
+
+How the merge works:
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Base docker-compose.yml:
+
+services:
+  app:
+    image: gymtracker
+    ports:
+      - "8087:8087"
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+
+
+docker-compose.override.yml:
+
+services:
+  app:
+    build: .
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      DB_URL_DEV: jdbc:postgresql://db:5432/GymTracker
+
+
+Merged result when running 'docker-compose up':
+
+services:
+  app:
+    image: gymtracker      # from base
+    build: .               # from override - added
+    ports:
+      - "8087:8087"        # from base
+    environment:
+      SPRING_PROFILES_ACTIVE: dev      # override wins
+      DB_URL_DEV: jdbc:postgresql://...# from override - added
+
+
+The workflow:
+----------------------------------
+
+Local development:
+docker-compose up
+→ loads docker-compose.yml + docker-compose.override.yml automatically
+→ builds from local Dockerfile
+→ uses dev profile and local env vars
+
+Production deployment:
+docker-compose -f docker-compose.yml -f docker-compose.prod.yml up
+→ loads base + prod file only
+→ uses pre-built image from registry
+→ uses prod profile and CI/CD injected secrets
+
+Why this pattern is powerful
+---------------------------------------
+
+Developer A clones repo
+→ creates their own docker-compose.override.yml with their local settings
+→ never commits it
+→ runs docker-compose up
+→ works immediately
+
+Developer B does the same
+→ completely different local settings
+→ never conflicts with Developer A
+→ both work from the same base config
+
+Each developer has their own local override that never touches the repo. The base config is the shared truth everyone
+works from

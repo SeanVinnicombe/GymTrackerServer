@@ -1,0 +1,11 @@
+.git
+.idea
+*.iml
+target/
+.mvn
+*.md
+.env
+docker-compose*.yml
+src/test
+
+# removes unnecassary files and folders from docker imnage that can slow down the build and expose sensitive data

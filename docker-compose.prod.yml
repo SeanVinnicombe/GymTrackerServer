@@ -1,0 +1,22 @@
+services:
+  db:
+    environment:
+      POSTGRES_USER: ${PROD_DB_USERNAME}
+      POSTGRES_PASSWORD: ${PROD_DB_PASSWORD}
+
+  app:
+    image: your-registry/gymtracker:${IMAGE_TAG}
+    restart: always
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      PROD_DB_URL: jdbc:postgresql://db:5432/GymTracker
+      PROD_DB_USERNAME: ${PROD_DB_USERNAME}
+      PROD_DB_PASSWORD: ${PROD_DB_PASSWORD}
+      PROD_JWT_SECRET: ${PROD_JWT_SECRET}
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: '0.5'
+
+# No actual secrets - just references to environment variables that get injected by CI/CD pipline or server configuration

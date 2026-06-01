@@ -32,8 +32,6 @@ public class ProgramService {
     private final UserService userService;
     private final ExerciseService exerciseService;
     private final ExerciseMapper exerciseMapper;
-    private final UserMapper userMapper;
-    private final ProgramWeekService programWeekService;
 
     @Autowired
     public ProgramService(ProgramRepository programRepository,
@@ -41,9 +39,7 @@ public class ProgramService {
                            ProgramDayService programDayService,
                            UserService userService,
                            ExerciseService exerciseService,
-                           ExerciseMapper exerciseMapper,
-                           UserMapper userMapper,
-                          ProgramWeekService programWeekService
+                           ExerciseMapper exerciseMapper
 
     ){
         this.programRepository = programRepository;
@@ -52,8 +48,6 @@ public class ProgramService {
         this.userService = userService;
         this.exerciseService = exerciseService;
         this.exerciseMapper = exerciseMapper;
-        this.userMapper = userMapper;
-        this.programWeekService = programWeekService;
     }
 
     /**

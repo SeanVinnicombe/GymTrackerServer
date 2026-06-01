@@ -14,7 +14,7 @@ public class UserBuilder {
     private String password = "12345";
     private Set<Program> programs = new HashSet<>();
 
-    public static UserBuilder aProgram(){
+    public static UserBuilder aUser(){
         return new UserBuilder();
     }
 

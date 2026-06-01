@@ -13,7 +13,7 @@ public class ProgramBuilder {
     Long id = 1L;
     private String name = "Strength";
     private Integer programLength = 8;
-    private User user = UserBuilder.aProgram().build();
+    private User user = UserBuilder.aUser().build();
     private List<ProgramWeek> programWeeks = new ArrayList<>();
     private int programWeeksCount = 5;
 

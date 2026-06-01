@@ -66,6 +66,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests((auth) -> auth
                         .requestMatchers("/auth/**").permitAll() // -> "auth" endpoints are public
                         .requestMatchers("/admin/**").hasRole("ADMIN") //"admin" endpoints are private
+                        .requestMatchers("/actuator/health").permitAll()
+                        .requestMatchers("/actuator/**").hasRole("ADMIN")
                         .requestMatchers("/swagger-ui/**").permitAll()
                         .anyRequest().authenticated() //every other request needs to be logged in
                 )

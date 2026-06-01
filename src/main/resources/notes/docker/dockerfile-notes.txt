@@ -86,8 +86,8 @@ Maven, JDK (NOT copied)     JRE only
 Crucially - only the files you explicitly copy come across. Maven, the JDK, source code, test files - all left behind
 in Stage 1. They never end up in final image.
 
-Why do we COPY pom.xml . separately before COPY src ./src?
----------------------------------------------------------------
+Why do we COPY pom.xml . separately before COPY src ./src? - Multi layer caching
+----------------------------------------------------------------------------------
 
 This has to do with layer caching.
 
