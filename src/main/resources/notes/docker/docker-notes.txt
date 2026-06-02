@@ -315,6 +315,56 @@ In the terminal of the project root folder run the following command: 'docker bu
 Docker will pull the 'eclipse-temurin:17-jre-focal' base image from Docker Hub if it doesnt't have it locally
 and build the image from there.
 
+Pushing image to Docker Hub
+===========================================
+
+Pushing image to Docker Hub makes the image publicly available to anyone who wishes to use it:
+
+Step 1: Tagging
+--------------------------------------
+
+A tag is simply a human-readable alias pointing to a specific image. The image currently locally exists as
+'gymtracker-app', but Docker doesn't know what that means. It needs to know:
+
+* Which registry to push to - Docker Hub, AWS ECR...
+* Which account owns the image
+* What version this is
+
+The tag command encodes all of that:
+
+your-dockerhub-username / gymtracker : 1.0.0
+        ↑                    ↑            ↑
+    account/registry      image name    version
+
+
+Without the tag Docker doesn't know where to push image to and what to call it in the registry
+
+Example:
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+docker tag gymtracker-app seanvinni/gymtracker:1.0.0
+
+Step 2: Pushing
+---------------------------------------
+
+This is the actual upload of image - transferring the image layers from your local machine to the remote repository.
+After pushing, anyone with access can pull it:
+
+docker pull your-dockerhub-username/gymtracker:1.0.0
+
+On any machine, anywhere in the world. No source code needed, No Maven, no Java. Only Docker.
+
+Example:
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+docker push seanvinni/gymtracker:1.0.0
+
+Real life analogy
+------------------------------------
+
+Tag  → writing the address on the envelope
+Push → putting it in the postbox and sending it
+
 
 
 

@@ -272,3 +272,90 @@ Developer B does the same
 
 Each developer has their own local override that never touches the repo. The base config is the shared truth everyone
 works from
+
+'depend_on' with health checks
+===========================================================
+
+Example:
+~~~~~~~~~~~~~
+
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: GymTracker
+      POSTGRES_USER: ${DB_USERNAME_DEV}
+      POSTGRES_PASSWORD: ${DB_PASSWORD_DEV}
+    ports:
+      - "5432:5432"
+    volumes:
+      - gymtracker_data:/var/lib/postgresql/data
+    networks:
+      - gymtracker_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  app:
+    restart: on-failure
+    ports:
+      - "8087:8087"
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - gymtracker_network
+
+
+Why use 'pg_ready', rather than waiting for container to start?
+---------------------------------------------------------------------
+
+When a PostgreSql container starts, it goes through several stages:
+
+Container starts
+      ↓
+Linux process launches
+      ↓
+PostgreSQL initialises shared memory
+      ↓
+PostgreSQL reads configuration files
+      ↓
+PostgreSQL replays WAL logs (crash recovery)
+      ↓
+PostgreSQL starts listening on port 5432
+      ↓
+PostgreSQL ready to accept connections ✅
+
+This process can take anywhere between 3-10 seconds depending on the machine. During that time the container is running
+but PostgreSql is not yet accepting conditions.
+
+Without health checks the app container sees:
+
+db container started ✅
+→ start app immediately
+→ app tries to connect to PostgreSQL
+→ PostgreSQL still initialising
+→ connection refused
+→ Spring Boot fails to start
+→ restart: on-failure kicks in
+→ retry... maybe works, maybe doesn't
+
+'pg_ready' specifically checks whether PostgreSql is accepting connections - not just whether the container is running.
+It's a PostgreSql built in tool that success only when database is genuinely ready.
+
+With health check:
+
+db container started
+→ pg_isready checks every 10 seconds
+→ fails while PostgreSQL initialising
+→ passes when PostgreSQL ready
+→ db marked healthy
+→ ONLY THEN does app container start
+→ guaranteed database connection on first try
+
+This is a race condition - a time dependent bug that sometimes works and sometimes doesn't depending on how fast your
+machine is. Race conditions are notorously hard to debug because they are intermittent.
+
+The health check eliminates race condition entirely by making the dependcy explicit and verified

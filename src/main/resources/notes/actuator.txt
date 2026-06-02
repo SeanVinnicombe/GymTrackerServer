@@ -149,3 +149,5 @@ Run health check
 
 Important to not make interval time too short as everything in application needs to start up and initialize and so if
 you set it too short, Docker might mark container as unhealthy before its even finished starting up.
+
+

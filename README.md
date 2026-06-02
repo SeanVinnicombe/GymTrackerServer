@@ -5,7 +5,7 @@ A gym tracking app that allows users to create and log workouts for gym progress
 
 ## Project Status
 
-This is currently an MVP (25–30 hours currently) to first focus on building correct structures and validating endpoints to ensure the flow of data 
+This is currently an MVP (40-45 hours currently) to first focus on building correct structures and validating endpoints to ensure the flow of data 
 is working correctly and the setup of the project was done correctly and according to industry standard before moving onto
 more production ready features and implementations.
 
@@ -34,10 +34,13 @@ more production ready features and implementations.
 - Foundation test coverage for Services and Controller
 - Test Builders for testing
 - Spring Security with JWT
+- Containerization
 
 
 ## To Still be implemented
-- Container usage – Docker
+- Kafka
+- Kubernetes
+- Cloud Deployment
 - More robust Integration tests
 - Introduction of Spring AI
 
@@ -49,8 +52,26 @@ more production ready features and implementations.
 - Improved global exception handling for security exceptions
 - Introduced profiles for development and production environments
 - Added Flyway for DB migrations
+- Introduction of containerization via Docker
+- Health checks via Actuator when starting up containers
 
 
 ## Next milestones
 - Improve test depth
 - Look into tools for deployment (Docker, Kafka and Kubernetes)
+
+### Docker
+
+Pull and run application from Docker Hub:
+
+```bash
+docker pull seanvinni/gymtracker:1.0.0
+```
+
+or run the full stack with Docker Compose:
+
+```bash
+docker-compose up
+```
+
+**Docker Hub:** https://hub.docker.com/r/seanvinni/gymtracker
