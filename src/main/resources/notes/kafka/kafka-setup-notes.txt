@@ -1,0 +1,100 @@
+Kafka in docker-compose.yml
+======================================
+
+kafka:
+  image: apache/kafka:3.8.0
+  container_name: gymtracker-kafka
+  environment:
+    KAFKA_NODE_ID: 1
+    KAFKA_PROCESS_ROLES: broker,controller
+    KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093
+    KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+    KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+    KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,CONTROLLER:PLAINTEXT
+    KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
+    KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    KAFKA_AUTO_CREATE_TOPICS_ENABLE: true
+  networks:
+    - gymtracker_network
+  healthcheck:
+    test: ["CMD-SHELL", "/opt/kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --list || exit 1"]
+    interval: 30s
+    timeout: 10s
+    retries: 3
+
+
+What are brokers and controllers(line:9)
+-------------------------------------------
+
+In a Kafka cluster with multiple servers, someone needs to be in charge.
+
+* Broker - the worker. This is what actually stores events and handles producer/consumer requests. When your Spring Boot
+ app publishes an event, it talks to a broker. When a consumer reads events, it reads from a broker. Brokers are the
+ core of Kafka - the receive, store and serve events.
+
+* Controller - the manager. In a KRaft cluster, one broker also acts as the controller - the leader responsible for
+managing cluster metadata. It tracks:
+
+- Which brokers are alive
+- Which broker leads which partition
+- Handling broker failures and reassigning partitions
+
+Broker    → stores and serves events (the worker)
+Controller → manages cluster state (the manager)
+
+In our single-node development setup 'KAFKA_PROCESS_ROLES: broker,controller' means one Kafka instance plays both roles
+- its both the worker and the manager. In production, you'd typically have separate dedicated brokers and controllers
+across multiple servers.
+
+
+Why we use 'kafka' as hostname instead of 'localhost'(line:11)
+----------------------------------------------------------------------
+
+When Spring Boot app container tries to connect to Kafka, it's running inside Docker. If the advertised listener said
+'localhost:9092', it would refer to the Spring Boot container itself - not the Kafka container. Connection would fail.
+
+By setting 'KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092', Kafka tells producers and consumers - 'to reach me, use
+the hostname kafka'. Dockers internal DNS resolves 'kafka' to the Kafka containers IP address - exactly how app connects
+'db:5432' for PostgreSql.
+
+localhost:9092  → Spring Boot container itself ❌
+kafka:9092      → Kafka container via Docker DNS ✅
+
+
+Replication factor
+------------------------------------------------------------------------
+
+Replication factor controls how many copies of each partition exists across brokers:
+
+Replication factor 1 → 1 copy of data (only on one broker)
+Replication factor 3 → 3 copies of data (on three different brokers)
+
+Why factor 1 is acceptable for dev
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+In dev, you have one Kafka broker - there's literally nowhere to replicate to. You also don't care if you lose events
+- its test data.
+
+Why factor 1 is dangerous in prod
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If that one broker fails, the data is gone. No copies exist anywhere else. In fintech where a Kafka event might be a
+financial transaction, losing events is catastrophic.
+
+Production with replication factor 3:
+Broker 1 dies → Brokers 2 and 3 still have all the data ✅
+Events continue flowing, nothing lost
+
+Development with replication factor 1:
+Broker 1 dies → data gone ❌
+But that's okay — just restart and use fresh test data
+
+The rule of thumb for production:
+
+Replication factor = number of brokers you can afford to lose + 1
+Typically 3 brokers, replication factor 3
+
+
+
+
+

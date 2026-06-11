@@ -1,0 +1,317 @@
+Restaurant analogy
+===========================
+
+Synchronous communication - the sit down restaurant
+-------------------------------------------------------
+
+You sit down, waiter takes your order and you wait. You can't do anything else. You just sit there until the food
+arrives. The waiter goes to the kitchen, the kitchen makes the food, the waiter brings it back. Everything happens in a
+chain - each step waits for the previous one to complete.
+
+This is exactly how RESt API works with this:
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Client sends request
+        ↓
+Server receives it
+        ↓
+Server processes it (queries DB, runs logic)
+        ↓
+Server sends response
+        ↓
+Client receives response and continues
+
+
+The client is blocked - waiting  - until the server responds. If the server takes 10 seconds, the client waits 10
+seconds. Everything is tightly coupled and sequential.
+
+
+Asynchronous communication - the fats food restaurant
+------------------------------------------------------------
+
+You walk up, place order, get receipt with number and step aside. You don't ait at the counter. You can sit down, check
+your phone, do whatever you want. When the food is ready tey call your number. You're not blocked - you placed your request and moved on.
+
+This is event-driven communication
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Client sends a message (event)
+        ↓
+Gets immediate acknowledgement
+        ↓
+Client moves on immediately
+        ↓
+        ↓ (meanwhile, somewhere else...)
+Server processes the message when ready
+        ↓
+Result available when done
+
+
+Why does this matter is real systems?
+------------------------------------------
+
+At the moment is gym tracker, when a user logs workout:
+
+POST /workouts
+        ↓
+Save to database
+        ↓
+Send confirmation email
+        ↓
+Update user statistics
+        ↓
+Notify personal trainer
+        ↓
+Response sent to client
+
+Every step happens synchronously in sequence. If sending the email takes 2 seconds, the user waits 2 seconds for a
+simple workout log. If the email service is down, the entire request fails - even though the workout was saved
+successfully.
+
+With asynchronous events:
+
+POST /workouts
+        ↓
+Save to database
+        ↓
+Publish "WorkoutLogged" event
+        ↓
+Immediate response to client ✅
+
+Meanwhile, independently:
+Email service receives event → sends email
+Statistics service receives event → updates stats
+Trainer service receives event → notifies trainer
+
+The client gets an instant response. Each downstream action happened independently. If the email service is down, the
+workout is still saved and stats still update - the email just gets processed later when the service recovers.
+
+This is the core value of Kafka
+========================================
+
+Kafka is a distributed event streaming platform - essentially a highly reliable, high performance message bus that sits
+between services.
+
+Publishers put events onto Kafka. Subscribers read events from Kafka. They never talk directly to each other.
+
+Without Kafka (tight coupling):
+
+WorkoutService → calls EmailService directly
+WorkoutService → calls StatsService directly
+WorkoutService → calls TrainerService directly
+
+With Kafka (loose coupling):
+
+WorkoutService → publishes event to Kafka
+                                    ↓
+                    EmailService reads from Kafka
+                    StatsService reads from Kafka
+                    TrainerService reads from Kafka
+
+
+3 core concepts
+------------------------------
+
+1. Topic - a named channel where events are published. Like a category. Gym tracker might have topics like:
+* workout-logged
+* user-registered
+* program-created
+
+2.Producer - Something that publishes events to a topic. 'WorkoutService' would be a producer - it publishes a
+'WorkoutLogged' event when a workout is saved.
+
+3. Consumer - Something that reads events from a topic. Your 'EmailService' would be a consumer - it reads 'WorkoutLogged'
+events and sends emails
+
+
+
+How it's used in real application - user registration
+====================================================================
+
+In a real application, when registering a new user, the application needs to:
+* Send welcome email
+* Set up default data for the user
+* Notify an admin
+* Create a free trial record
+* Log to an analytical system
+
+With synchronous code all the of that happens before response goes back. With Kafka:
+
+Save user → publish "UserRegistered" event → return token immediately
+
+Meanwhile, independently:
+Email service → sends welcome email
+Analytics service → records new signup
+Admin service → notifies admin dashboard
+
+User gets their token instantly. Everything else happens in the background.
+
+Message bus and distributed systems
+==========================================================
+
+A message bus is simply an intermediary that sits between services and handles passing messages them. Instead of Service A
+calling Service B directly, both talk through the bus.
+
+It's basically like postal system. Instead of hand-delivering every letter yourself, you drop it at the post office and
+they handle delivery. The sender and receiver never need to meet.
+
+Without message bus:
+ServiceA ──────────────────► ServiceB
+(direct call, tight coupling)
+
+With message bus:
+ServiceA ──► [Message Bus] ──► ServiceB
+(indirect, loose coupling)
+
+Difference between distributed and single server
+----------------------------------------------------------
+
+A single server message bus is like having one post office inn the entire country. If that post office burns down - no
+mail gets delivered anywhere. It's a single point of failure.
+
+A distributed system spreads the work across multiple servers:
+
+Single server:
+[One Kafka Server]
+→ if it dies, everything stops ❌
+
+Distributed (Kafka cluster):
+[Kafka Server 1]
+[Kafka Server 2]  → if one dies, others continue ✅
+[Kafka Server 3]
+
+Kafka is distributed by design - it runs as a cluster of multiple servers called brokers. Events are replicated across
+brokers. If one broker dies, others have copies of the events and processing continues uninterrupted.
+
+This is a critical for fintech where messages represent financial transactions.
+
+What happens if a Consumer is down?
+===============================================
+
+Direct REST call:
+
+WorkoutService calls EmailService directly
+EmailService is down
+→ call fails immediately
+→ email never sent
+→ potentially the whole workout save fails too
+→ user gets an error
+
+Kafka:
+
+WorkoutService publishes event to Kafka
+EmailService is down
+→ event sits safely in Kafka
+→ workout saved successfully
+→ user gets immediate success response
+→ EmailService comes back up
+→ reads the waiting event from Kafka
+→ email sent — just delayed, not lost
+
+
+Kafka persists events - stores the on disk, not just in memory. Events aren't discarded when a consumer is unavailable.
+They wait in Kafka until a consumer is ready to process them.
+
+This is called durability - one of Kafka's guarantees.
+
+Key properties of Kafka guarantees
+=============================================
+
+Durability    → events are persisted to disk, not lost if consumers are down
+Fault tolerance → distributed across multiple brokers, survives server failures
+Scalability   → can handle millions of events per second
+Ordering      → events within a partition are strictly ordered
+Replay        → consumers can re-read old events if needed
+
+
+How does Kafka really work
+=============================================
+
+Kafka organizes events into topics, and topics are divided into partitions:
+
+Topic: "user-registered"
+├── Partition 0: [event1, event4, event7, ...]
+├── Partition 1: [event2, event5, event8, ...]
+└── Partition 2: [event3, event6, event9, ...]
+
+Why partitions?
+------------------------------------
+
+Partitions allow Kafka to scale horizontally. a single partition is processed by one consumer at a time - but multiple
+partitions can be processed by multiple consumers simultaneously.
+
+3 partitions → 3 consumers processing in parallel
+→ 3x the throughput of a single partition
+
+Consumer groups
+--------------------------------------
+
+Multiple consumers can work together as a consumer group to process a topic in parallel. Each partition is assigned to
+exactly one consumer in the group:
+
+Topic: "workout-logged" (3 partitions)
+Consumer Group: "email-service"
+├── Consumer 1 → reads Partition 0
+├── Consumer 2 → reads Partition 1
+└── Consumer 3 → reads Partition 2
+
+This is how Kafka scales - add more partitions and more consumers to handle higher load.
+
+Offsets
+-----------------------------------
+
+Kafka tracks where each consumer is up to using an offset - essentially a position number in a partition:
+
+Partition 0: [event0, event1, event2, event3, event4, ...]
+                                      ↑
+                              Consumer is here (offset 3)
+                              Next will read event3
+
+The consumer controls its own offset. This is what enables the replay capability - you can reset an offset to reread
+old events.
+
+
+Ho to identify opportunity for Kafka
+====================================================
+
+Don't try and force Kafka into code!!! Look carefully and identify which processes need to happen synchronously and which
+can happen asynchronously.
+
+The questions to always ask is: "Does the client need the result of this operation immediately, or can it happen
+in the background?"
+
+If yes — synchronous REST is correct.
+If no — Kafka might be appropriate.
+
+Another question to ask is: ""Are there multiple independent things that need to happen as a result of one action?"
+
+This is where Kafka shines - one event triggers multiple independent reactions.
+
+Example:
+------------------
+When a User registers:
+
+Immediate need: return JWT token ← must be synchronous
+Background needs:
+- Send welcome email
+- Set up default exercises for their profile
+- Log signup analytics
+
+The JWT must come back immediately. The rest can happen asynchronously via UserRegistered event.
+
+
+Kafka is not a performance tool for speeding up slow operations. It's a decoupling tool for separating core business
+operations from there side effects.
+
+Core operation (must succeed, client needs result) → synchronous REST
+Side effects (nice to have, client doesn't need to wait) → async Kafka event
+
+Primary benefits of Kafka
+==================================
+
+1. Resilience    → consumer failure doesn't fail the producer
+2. Scalability   → consumers can scale independently of producers
+3. Decoupling    → producer doesn't know or care who consumes its events
+4. Replayability → events can be reprocessed if something goes wrong
+Speed is a side effect, not the main purpose
+

@@ -23,7 +23,6 @@ public class ProgramWeekService {
 
     private final ProgramWeekRepository repository;
     private final ProgramWeekMapper mapper;
-    private final ExerciseSessionService exerciseSessionService;
     //private int weekNumber;
 
     /**
@@ -45,12 +44,10 @@ public class ProgramWeekService {
 
     @Autowired
     public ProgramWeekService(ProgramWeekRepository repository,
-                              ProgramWeekMapper mapper,
-                              ExerciseSessionService exerciseSessionService
+                              ProgramWeekMapper mapper
     ) {
         this.repository = repository;
         this.mapper = mapper;
-        this.exerciseSessionService = exerciseSessionService;
     }
 
     public ProgramWeekDto getProgramWeek(Long programId, Integer weekNumber) {
@@ -63,10 +60,6 @@ public class ProgramWeekService {
                         .toList())
         );
         return mapper.toDto(result);
-    }
-
-    public List<ProgramWeekDto> getProgramWeeksByProgramId(Long programId) {
-        return repository.findAllByProgram_Id(programId).stream().map(mapper::toDto).toList();
     }
 
     @Transactional
