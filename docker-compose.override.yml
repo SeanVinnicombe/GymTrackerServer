@@ -15,6 +15,10 @@ services:
       DB_USERNAME_DEV: postgres
       DB_PASSWORD_DEV: postgres
       JWT_SECRET_DEV: ${JWT_SECRET_DEV}
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      # important to override kafka port otherwise docker will start up looking for kafka at localhost:9092(localhost is address of app container in docker instance. Kafka container is at 'kafka:9092')
 
 
-# This file is gitignore because it contains sensitive data
+
+
+#This file is gitignore because it contains sensitive data

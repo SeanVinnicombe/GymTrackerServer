@@ -1,0 +1,55 @@
+CREATE SEQUENCE public.users_seq
+    INCREMENT BY 1
+    START WITH 2
+    MINVALUE 1
+    NO MAXVALUE
+    CACHE 1;
+
+CREATE SEQUENCE public.exercise_seq
+    INCREMENT BY 1
+    START WITH 44
+    MINVALUE 1
+    NO MAXVALUE
+    CACHE 1;
+
+CREATE SEQUENCE public.program_seq
+    INCREMENT BY 1
+    START WITH 4
+    MINVALUE 1
+    NO MAXVALUE
+    CACHE 1;
+
+CREATE SEQUENCE public.program_week_seq
+    INCREMENT BY 1
+    START WITH 9
+    MINVALUE 1
+    NO MAXVALUE
+    CACHE 1;
+
+CREATE SEQUENCE public.program_day_seq
+    INCREMENT BY 1
+    START WITH 10
+    MINVALUE 1
+    NO MAXVALUE
+    CACHE 1;
+
+CREATE SEQUENCE public.program_day_exercises_seq
+    INCREMENT BY 1
+    START WITH 25
+    MINVALUE 1
+    NO MAXVALUE
+    CACHE 1;
+
+CREATE SEQUENCE public.exercise_session_seq
+    INCREMENT BY 1
+    START WITH 2
+    MINVALUE 1
+    NO MAXVALUE
+    CACHE 1;
+
+CREATE SEQUENCE public.set_seq
+    INCREMENT BY 1
+    START WITH 4
+    MINVALUE 1
+    NO MAXVALUE
+    CACHE 1;

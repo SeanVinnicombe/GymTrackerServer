@@ -5,7 +5,9 @@ import com.github.seanv.gymtracker.dto.input.LoginInputDto;
 import com.github.seanv.gymtracker.dto.input.SignUpInputDto;
 import com.github.seanv.gymtracker.entities.User;
 import com.github.seanv.gymtracker.entities.enums.Role;
+import com.github.seanv.gymtracker.events.UserRegisteredEvent;
 import com.github.seanv.gymtracker.exception.type.UserAlreadyExistsException;
+import com.github.seanv.gymtracker.kafka.producer.UserEventProducer;
 import com.github.seanv.gymtracker.repositories.UserRepository;
 import com.github.seanv.gymtracker.security.JwtService;
 import com.github.seanv.gymtracker.security.SecurityService;
@@ -16,6 +18,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+
 @Service
 public class AuthService {
 
@@ -24,18 +28,21 @@ public class AuthService {
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
     private final SecurityService securityService;
+    private final UserEventProducer userEventProducer;
 
     @Autowired
     public AuthService(UserRepository userRepository,
                        PasswordEncoder passwordEncoder,
                        AuthenticationManager authenticationManager,
                        JwtService jwtService,
-                       SecurityService securityService){
+                       SecurityService securityService,
+                       UserEventProducer userEventProducer) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.authenticationManager = authenticationManager;
         this.jwtService = jwtService;
         this.securityService = securityService;
+        this.userEventProducer = userEventProducer;
     }
 
     public AuthResponse saveUser(SignUpInputDto inputDto){
@@ -47,6 +54,14 @@ public class AuthService {
         User savedUser = userRepository.save(user);
 
         UserDetails userDetails = securityService.loadUserByUsername(savedUser.getEmail());
+
+        userEventProducer.publishUserRegistered(
+                new UserRegisteredEvent(
+                        savedUser.getId(),
+                        savedUser.getEmail(),
+                        savedUser.getFirstName(),
+                        LocalDateTime.now())
+        );
 
         return new AuthResponse(jwtService.generateToken(userDetails));
     }

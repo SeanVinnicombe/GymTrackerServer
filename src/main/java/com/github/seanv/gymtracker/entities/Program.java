@@ -17,7 +17,8 @@ import java.util.Set;
 public class Program {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "program_seq_gen")
+    @SequenceGenerator(name = "program_seq_gen", sequenceName = "program_seq", allocationSize = 1)
     private Long id;
 
     @Column(name = "name")

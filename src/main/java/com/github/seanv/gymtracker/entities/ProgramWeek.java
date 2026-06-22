@@ -17,7 +17,8 @@ import java.util.List;
 public class ProgramWeek {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "program_week_seq_gen")
+    @SequenceGenerator(name = "program_week_seq_gen", sequenceName = "program_week_seq", allocationSize = 1)
     private Long id;
 
     @ManyToOne

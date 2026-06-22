@@ -20,7 +20,8 @@ import java.util.Set;
 public class User {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "users_seq_gen")
+    @SequenceGenerator(name = "users_seq_gen", sequenceName = "users_seq", allocationSize = 1)
     private Long id;
 
     @Column(name = "first_name")
@@ -65,3 +66,19 @@ public class User {
         return Objects.hashCode(id);
     }
 }
+
+/** So hashcode represents the hex number, which can be seen almost as the memory address of an object and that number
+ * is used when comparing 2 object to each other to determine whether they are in fact equal as it is comparing
+ *  the memory addresses
+ *
+ *  equals() is method that is now used to compare the inner contents of 2 objects and determine if they are equal in
+ *  that regard.
+ *
+ *  Both methods are inherited from superclass Object, since all classes implement it and if not overridden,
+ *  those implementations will be used. In superclass, equals() uses "==" and not inner field or value comparisons
+ *  so in that implementation it is comparing memery addresses.
+ *
+ *  hashCode() must never include a lazy collection, as when trying to generatehashCode(), it could touch a collection
+ *  that's still busy populating and therefore incomplete - you wouldn't move a family into a incomplete house.
+ *  They should aslo never rely on mutable fields, that's why id is the only neccessary value as its unique and immutable
+ */
