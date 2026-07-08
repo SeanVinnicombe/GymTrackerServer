@@ -42,7 +42,7 @@ public class ExerciseSessionController {
 
     })
     public ResponseEntity<ExerciseSessionDto> getExerciseSession(@PathVariable Long id) {
-        return ResponseEntity.status(HttpStatus.FOUND).body(service.getByExerciseSessionId(id));
+        return ResponseEntity.status(HttpStatus.OK).body(service.getByExerciseSessionId(id));
     }
 
     @GetMapping("/exists/program-day-exercise/{id}")
@@ -57,7 +57,7 @@ public class ExerciseSessionController {
 
     })
     public ResponseEntity<Boolean> existByProgramDayExerciseId(@PathVariable Long id) {
-        return ResponseEntity.status(HttpStatus.FOUND).body(service.existsByProgramDayExerciseId(id));
+        return ResponseEntity.status(HttpStatus.OK).body(service.existsByProgramDayExerciseId(id));
     }
 
 

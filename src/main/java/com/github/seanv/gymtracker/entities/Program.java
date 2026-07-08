@@ -1,12 +1,12 @@
 package com.github.seanv.gymtracker.entities;
 
+import com.github.seanv.gymtracker.entities.enums.ProgramStatus;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
-import org.springframework.security.core.parameters.P;
 
+import java.time.LocalDateTime;
 import java.util.*;
-import java.util.Set;
 
 @Entity
 @Getter
@@ -26,6 +26,15 @@ public class Program {
 
     @Column(name = "program_length")
     private Integer programLength;
+
+    @Column(name = "status")
+    private ProgramStatus status;
+
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
+
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @NotNull

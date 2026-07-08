@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
@@ -29,6 +30,12 @@ public class ProgramDay {
     @JoinColumn(name = "program_week_id", nullable = false)
     @NotNull
     private ProgramWeek programWeek;
+
+    @Column(name = "is_completed")
+    private Boolean isCompleted;
+
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
 
     @ManyToMany
     @JoinTable(

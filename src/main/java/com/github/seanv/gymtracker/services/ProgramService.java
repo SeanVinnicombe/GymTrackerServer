@@ -129,7 +129,7 @@ public class ProgramService {
                     programDayExercise.setProgramDay(programDay);
                     var exercise = exerciseService.getExercise(pde.exerciseId());
                     programDayExercise.setExercise(exerciseMapper.fromDto(exercise));
-                    programDayExercise.setExerciseNumber(++exerciseCount);
+                    programDayExercise.setExerciseOrder(++exerciseCount);
                     programDayExercise.setTargetReps(pde.targetReps());
                     programDayExercise.setTargetSets(pde.targetSets());
                     programDayExercises.add(programDayExercise);

@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 
@@ -20,8 +21,8 @@ public class ProgramDayExercise {
     @SequenceGenerator(name = "program_day_exercise_seq_gen", sequenceName = "program_day_exercise_seq", allocationSize = 1)
     private Long id;
 
-    @Column(name = "exercise_number")
-    private Integer exerciseNumber;
+    @Column(name = "exercise_order")
+    private Integer exerciseOrder;
 
     @Column(name = "target_reps")
     private Integer targetReps;
@@ -33,6 +34,12 @@ public class ProgramDayExercise {
     @JoinColumn(name = "program_day_id", nullable = false)
     @NotNull
     private ProgramDay programDay;
+
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
+
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
 
     @ManyToOne
     @JoinColumn(name = "exercise_id", nullable = false)

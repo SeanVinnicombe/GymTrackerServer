@@ -56,7 +56,7 @@ public class ProgramWeekService {
         result.getProgramDays().forEach(
                 i -> i.setProgramDayExercises(i.getProgramDayExercises()
                         .stream()
-                        .sorted(Comparator.comparing(ProgramDayExercise::getExerciseNumber))
+                        .sorted(Comparator.comparing(ProgramDayExercise::getExerciseOrder))
                         .toList())
         );
         return mapper.toDto(result);

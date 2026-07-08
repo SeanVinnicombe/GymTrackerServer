@@ -4,6 +4,7 @@ import com.github.seanv.gymtracker.entities.enums.MuscleGroup;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.Set;
 
@@ -26,6 +27,10 @@ public class Exercise {
     @Column(name = "muscle_group")
     @Enumerated(EnumType.STRING)
     private MuscleGroup muscleGroup;
+
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
+
 
     /**
      * @Enumerated tells application how db should use enums as enums exists in java, but not in db so we cant use
