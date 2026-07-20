@@ -52,14 +52,20 @@ public class ProgramWeekController {
             @ApiResponse(responseCode = "500", description = "Something went wrong...", content = @Content(mediaType = "application.json", schema = @Schema(implementation = ApiError.class)))
     })
     @Operation(description = "Request responsible for updating specific program week")
-    @PutMapping("{programWeekId}/log")
+    @PostMapping("{programWeekId}")
     public ResponseEntity<ProgramWeekDto> updateProgramWeek(
-            @PathVariable("programWeekId") Long programWeekId,
+            @PathVariable Long programWeekId,
             @RequestBody @Valid ProgramWeekUpdateDto updateDto)
     {
 
         return ResponseEntity.status(HttpStatus.CREATED).body(service.updateProgramWeek(programWeekId, updateDto));
 
     }
+
+    @GetMapping("/past/{weekNumber}")
+    public ResponseEntity<ProgramWeekDto> getPastProgramWeeks(@PathVariable Integer weekNumber){
+        return null;
+    }
+
 
 }

@@ -13,10 +13,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "Exercise Session", description = "Requests related to Exercise session")
 @RestController
@@ -45,19 +42,9 @@ public class ExerciseSessionController {
         return ResponseEntity.status(HttpStatus.OK).body(service.getByExerciseSessionId(id));
     }
 
-    @GetMapping("/exists/program-day-exercise/{id}")
-    @Operation(description = "Does Exercise Session exist by id")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Exercise session does exist by Program Day Exercise id",
-                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = Boolean.class))),
-            @ApiResponse(responseCode = "404", description = "Exercise session does not exist for given id",
-                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = Boolean.class))),
-            @ApiResponse(responseCode = "500", description = "Something went wrong...",
-                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiError.class))),
-
-    })
-    public ResponseEntity<Boolean> existByProgramDayExerciseId(@PathVariable Long id) {
-        return ResponseEntity.status(HttpStatus.OK).body(service.existsByProgramDayExerciseId(id));
+    @PostMapping()
+    public ResponseEntity<ExerciseSessionDto> logExercisesSession(@RequestBody ExerciseSessionDto dto){
+        return null;
     }
 
 

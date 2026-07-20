@@ -15,6 +15,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import java.util.concurrent.Future;
+
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
@@ -81,7 +83,6 @@ public class SecurityConfig {
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)); // REST is stateless, we're not using
                                                                     // sessions but token
-
         return http.build();
     }
 

@@ -15,10 +15,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -35,5 +32,17 @@ public class UserController {
 
         this.userService = userService;
         this.programService = programService;
+    }
+
+    @Operation(description = "Update profile")
+    @PatchMapping("/{id}")
+    public ResponseEntity<UserDto> updateProfile(@RequestBody UserDto dto, @PathVariable String id){
+        return null;
+    }
+
+    @Operation(description = "Delete profile")
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Boolean> deleteProfile(@PathVariable Long id){
+        return null;
     }
 }

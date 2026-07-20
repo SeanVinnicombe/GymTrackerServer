@@ -19,6 +19,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.function.Consumer;
 
 
@@ -85,6 +86,41 @@ public class ProgramController {
     @PostMapping()
     public ResponseEntity<ProgramDto> createProgram(@RequestBody ProgramInputDto inputDto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(programService.createProgram(inputDto));
+    }
+
+    @Operation(description = "Updating existing Program")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Program successfully updated",
+                    content = @Content(mediaType = "application.json",
+                            schema = @Schema(implementation = ProgramDto.class))),
+            @ApiResponse(responseCode = "400", description = "Invalid input was provided",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ApiError.class))),
+            @ApiResponse(responseCode = "500", description = "Something went wrong...",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ApiError.class)))
+    })
+    @PatchMapping("/{id}")
+    public ResponseEntity<ProgramDto> updateProgram(@RequestBody ProgramInputDto inputDto, @PathVariable String id) {
+        return ResponseEntity.status(HttpStatus.OK).body(programService.createProgram(inputDto));
+    }
+
+    @Operation(description = "Activating a program")
+    @PatchMapping("/{id}/activate")
+    public ResponseEntity<Boolean> activateProgram(@PathVariable Long id){
+        return null;
+    }
+
+    @Operation(description = "Deleting a program")
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Boolean> deleteProgram(@PathVariable Long id){
+        return null;
+    }
+
+    @Operation(description = "View past programs")
+    @GetMapping("/{programId}/past")
+    public ResponseEntity<List<ProgramDto>> getPastPrograms(@PathVariable String programId){
+        return null;
     }
 
 

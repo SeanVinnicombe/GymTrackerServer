@@ -167,5 +167,53 @@ erDiagram
   - muscleGroup
   - createdAt
 
+### 3.4 API Design
+
+#### User
+
+- PATCH /users/{id} → Update a user
+- DELETE /{id} → Delete user
+
+### Program
+
+- GET /programs/{id} → Get Program by id
+- GET /programs → Get all programs
+- GET /programs/{programId}/past → Get past programs
+- POST /programs → Create a new Program
+- PATCH /programs/{id} → Update existing program
+- PATCH /programs/{id}/activate → Activate a program as the current program
+- DELETE /programs/{id} → Delete a program
+
+### ProgramWeek
+
+- GET /program-weeks/{programId}/week/{weekNumber} → Get Program week by Program id and week number
+- GET /program-weeks/past/{weekNumber} → Get past Program week by week number
+- POST /programs-weeks/{programWeekId} → Log Program week data
+
+### ProgramDay
+
+- POST /program-days/{programId}/{weekNumber} → Change state of Program day
+
+### ProgramDayExercise
+
+- GET /program-day-exercises/{id} → Get Program day exercise information by id
+- PUT /program-day-exercise/{programId}/{dayId}/{exerciseNumber} → Update an exercise for ProgramDayExercise
+
+### Exercise
+
+- GET /exercises/muscle-group → Get exercises by muscle group
+- POST /exercises → Add a new exercise
+
+
+### ExerciseSession
+
+- GET /exercises-session/{id} → Get Exercise session by Id
+- POST /exercises-session → Log Exercise session data
+
+
+### Authentication
+
+- POST /login → Log into application
+- POST /register → Register a new user
 
 

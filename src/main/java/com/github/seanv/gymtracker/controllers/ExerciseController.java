@@ -41,7 +41,7 @@ public class ExerciseController {
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = ApiError.class))),
     })
-    @GetMapping("/muscleGroup/{muscleGroup}")
+    @GetMapping("/muscle-group/{muscleGroup}")
     public ResponseEntity<ExerciseResponse> getExercisesByMuscleGroup(@PathVariable("muscleGroup") MuscleGroup muscleGroup) {
         var list = exerciseService.getAllExercisesByMuscleGroup(muscleGroup);
         var response = new ExerciseResponse(list);
@@ -61,7 +61,7 @@ public class ExerciseController {
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = ApiError.class))),
     })
-    @PostMapping("/add")
+    @PostMapping()
     public ResponseEntity<ExerciseDto> addNewExercise(@Valid @org.springframework.web.bind.annotation.RequestBody
           @RequestBody(
                   description = "Exercise to add",
