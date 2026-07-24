@@ -13,4 +13,14 @@ import java.util.List;
 public interface ProgramDayExerciseRepository extends JpaRepository<ProgramDayExercise, Long> {
 
     List<ProgramDayExercise> findAllByProgramDay_Id( Long programDayId);
+
+    @Query(
+            " select count(pde) from ProgramDayExercise pde " +
+                    "join pde.programDay pd " +
+                    "join pd.programWeek pw " +
+                    "join pw.program p " +
+                    "where p.id = :programId " +
+                    "and pde.id = :id"
+    )
+    public boolean existsByIdAndProgramId(@Param("id") Long id, @Param("programId") Long programId);
 }

@@ -171,33 +171,64 @@ erDiagram
 
 #### User
 
-- PATCH /users/{id} → Update a user
-- DELETE /{id} → Delete user
+- PATCH /users → Update a user
+- DELETE /users → Delete user
 
 ### Program
 
 - GET /programs/{id} → Get Program by id
 - GET /programs → Get all programs
-- GET /programs/{programId}/past → Get past programs
-- POST /programs → Create a new Program
+- GET /programs?status={status} → Get past programs
+- POST /programs → Create a new Program 
+
+**Request Body:**
+```json
+{
+  "name": "Push Pull Legs",
+  "weeks": [
+    {
+      "weekNumber": 1,
+      "days": [
+        {
+          "muscleGroup": "Chest",
+          "programDayExercises": [
+            {
+              "exerciseId": 1,
+              "exerciseNumber": 1,
+              "targetSets": 4,
+              "targetReps": 8
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
+```
+**Response:** `201 Created` → on success
+**Error Responses:**
+- `404 Not Found` → program does not exist
+- `409 Conflict` → no active program
+- `403 Forbidden` → unauthorised
+---
+
 - PATCH /programs/{id} → Update existing program
 - PATCH /programs/{id}/activate → Activate a program as the current program
 - DELETE /programs/{id} → Delete a program
 
 ### ProgramWeek
 
-- GET /program-weeks/{programId}/week/{weekNumber} → Get Program week by Program id and week number
-- GET /program-weeks/past/{weekNumber} → Get past Program week by week number
-- POST /programs-weeks/{programWeekId} → Log Program week data
+- GET /program-weeks/{id} → Get Program week by id
+- PATCH /programs-weeks/{id} → Log Program week data
 
 ### ProgramDay
 
-- POST /program-days/{programId}/{weekNumber} → Change state of Program day
+- PATCH /program-days/{programId} → Change state of Program day
 
 ### ProgramDayExercise
 
 - GET /program-day-exercises/{id} → Get Program day exercise information by id
-- PUT /program-day-exercise/{programId}/{dayId}/{exerciseNumber} → Update an exercise for ProgramDayExercise
+- PATCH /program-day-exercise/{id} → Update an exercise for ProgramDayExercise
 
 ### Exercise
 

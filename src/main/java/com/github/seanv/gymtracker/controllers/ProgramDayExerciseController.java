@@ -40,8 +40,8 @@ public class ProgramDayExerciseController {
         return ResponseEntity.ok(service.getProgramDayExercise(id));
     }
 
-    @PutMapping("/{programId}/{dayId}")
-    public ResponseEntity<ProgramDayExerciseDto> updateProgramDayExercise(@PathVariable Long programId, @PathVariable Long dayId, @RequestBody ProgramDayExerciseDto dto) {
+    @PutMapping("/{id}")
+    public ResponseEntity<ProgramDayExerciseDto> updateProgramDayExercise(@PathVariable Long id, @RequestBody ProgramDayExerciseDto dto) {
         return null;
     }
 }

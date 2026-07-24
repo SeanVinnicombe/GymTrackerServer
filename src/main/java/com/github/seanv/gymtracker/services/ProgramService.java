@@ -2,7 +2,6 @@ package com.github.seanv.gymtracker.services;
 
 import com.github.seanv.gymtracker.dto.ProgramDayDto;
 import com.github.seanv.gymtracker.dto.ProgramDto;
-import com.github.seanv.gymtracker.dto.ProgramWeekDto;
 import com.github.seanv.gymtracker.dto.input.ProgramDayExerciseInputDto;
 import com.github.seanv.gymtracker.dto.input.ProgramDayInputDto;
 import com.github.seanv.gymtracker.dto.input.ProgramInputDto;
@@ -10,18 +9,14 @@ import com.github.seanv.gymtracker.entities.*;
 import com.github.seanv.gymtracker.exception.type.ProgramNotFoundException;
 import com.github.seanv.gymtracker.mappers.ExerciseMapper;
 import com.github.seanv.gymtracker.mappers.ProgramMapper;
-import com.github.seanv.gymtracker.mappers.UserMapper;
 import com.github.seanv.gymtracker.repositories.ProgramRepository;
-import com.github.seanv.gymtracker.security.UserPrincipal;
+import com.github.seanv.gymtracker.security.SecurityService;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 @Service
 public class ProgramService {
@@ -32,6 +27,7 @@ public class ProgramService {
     private final UserService userService;
     private final ExerciseService exerciseService;
     private final ExerciseMapper exerciseMapper;
+    private final SecurityService securityService;
 
     @Autowired
     public ProgramService(ProgramRepository programRepository,
@@ -39,7 +35,8 @@ public class ProgramService {
                            ProgramDayService programDayService,
                            UserService userService,
                            ExerciseService exerciseService,
-                           ExerciseMapper exerciseMapper
+                           ExerciseMapper exerciseMapper,
+                          SecurityService securityService
 
     ){
         this.programRepository = programRepository;
@@ -48,6 +45,7 @@ public class ProgramService {
         this.userService = userService;
         this.exerciseService = exerciseService;
         this.exerciseMapper = exerciseMapper;
+        this.securityService = securityService;
     }
 
     /**
@@ -83,11 +81,7 @@ public class ProgramService {
 
     @Transactional
     public List<ProgramDto> getAllPrograms(){
-        var holder = SecurityContextHolder.getContext();
-        UserPrincipal principal = (UserPrincipal) Objects.requireNonNull(holder.getAuthentication()).getPrincipal();
-        assert principal != null;
-        String email = principal.getUsername();
-        Long userId = userService.getUserIdByEmail(email);
+        Long userId = securityService.getCurrentUserId();
         List<Program> programs =  programRepository.getAllProgramsByUser_Id(userId);
         return programs.stream().map(mapper::toDto).toList();
     }
@@ -121,7 +115,7 @@ public class ProgramService {
             programWeek.setWeekNumber(++weekCount);
             for(ProgramDayInputDto pd : inputDto.programWeeks().get(i).programDays()){
                 ProgramDay programDay = new ProgramDay();
-                programDay.setMuscleGroup(pd.muscleGroups());
+                programDay.setMuscleGroup(pd.muscleGroup());
                 List<ProgramDayExercise> programDayExercises = new ArrayList<>();
                 int exerciseCount = 0;
                 for(ProgramDayExerciseInputDto pde : pd.programDayExercises()){

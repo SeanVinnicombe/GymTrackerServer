@@ -8,7 +8,6 @@ public record ProgramDayExerciseInputDto(
         @NotNull Long exerciseId,
         @NotNull Integer exerciseNumber,
         @NotNull Integer targetSets,
-        @NotNull Integer targetReps,
-        List<ExerciseSessionInputDto> exerciseSession
+        @NotNull Integer targetReps
         ) {
 }

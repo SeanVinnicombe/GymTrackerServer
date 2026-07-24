@@ -1,11 +1,16 @@
 package com.github.seanv.gymtracker.services;
 
 import com.github.seanv.gymtracker.dto.ExerciseSessionDto;
+import com.github.seanv.gymtracker.dto.ProgramDayExerciseDto;
+import com.github.seanv.gymtracker.dto.input.ExerciseSessionInputDto;
 import com.github.seanv.gymtracker.entities.ExerciseSession;
+import com.github.seanv.gymtracker.entities.ProgramDayExercise;
 import com.github.seanv.gymtracker.exception.type.ExerciseSessionNotFoundException;
+import com.github.seanv.gymtracker.exception.type.ProgramDayExerciseNotFoundException;
 import com.github.seanv.gymtracker.mappers.ExerciseSessionMapper;
 import com.github.seanv.gymtracker.repositories.ExerciseSessionRepository;
 import com.github.seanv.gymtracker.repositories.SetRepository;
+import com.github.seanv.gymtracker.security.SecurityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,14 +21,20 @@ public class ExerciseSessionService {
     private final ExerciseSessionRepository repository;
     private final ExerciseSessionMapper mapper;
     private final SetService setService;
+    private final SecurityService securityService;
+    private final ProgramDayExerciseService pdeService;
 
     @Autowired
     public ExerciseSessionService(ExerciseSessionRepository repository,
                                   ExerciseSessionMapper mapper,
-                                  SetService setService){
+                                  SetService setService,
+                                  SecurityService securityService,
+                                  ProgramDayExerciseService pdeService){
         this.repository = repository;
         this.mapper = mapper;
         this.setService = setService;
+        this.securityService = securityService;
+        this.pdeService = pdeService;
     }
 
     public ExerciseSessionDto getByExerciseSessionId(Long id){
@@ -57,5 +68,17 @@ public class ExerciseSessionService {
 
     public Boolean existsByProgramDayExerciseIdAndWeekNumber(Long id, int weekNumber){
         return repository.existsByProgramDayExercise_IdAndWeekNumber(id, weekNumber);
+    }
+
+    public ExerciseSessionDto logExerciseSession(ExerciseSessionInputDto dto){
+
+        Boolean correctPDEOwner = securityService.programDayOwnershipCheck(dto.programDayExerciseId());
+        ProgramDayExerciseDto pde = pdeService.getProgramDayExercise(dto.programDayExerciseId());
+
+        if (!correctPDEOwner || pde != null){
+            throw new ProgramDayExerciseNotFoundException(dto.programDayExerciseId());
+        }
+
+        return null;
     }
 }

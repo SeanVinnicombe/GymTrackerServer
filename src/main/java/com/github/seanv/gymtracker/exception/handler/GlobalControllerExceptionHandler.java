@@ -50,6 +50,17 @@ public class GlobalControllerExceptionHandler {
         );
     }
 
+    @ExceptionHandler(NoActiveProgramException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ApiError handleNoActiveProgramException(NoActiveProgramException ex){
+        return new ApiError(
+                HttpStatus.CONFLICT.value(),
+                HttpStatus.CONFLICT.name(),
+                ex.getMessage(),
+                LocalDateTime.now()
+        );
+    }
+
     // ==================== USER ====================
 
     @ExceptionHandler(UserNotFoundException.class)
@@ -175,4 +186,7 @@ public class GlobalControllerExceptionHandler {
                 LocalDateTime.now()
         );
     }
+
+    // ==================== SECURITY ====================
+
 }

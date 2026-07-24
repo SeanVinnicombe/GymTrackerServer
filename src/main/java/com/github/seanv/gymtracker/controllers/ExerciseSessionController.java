@@ -2,6 +2,7 @@ package com.github.seanv.gymtracker.controllers;
 
 import com.github.seanv.gymtracker.dto.ExerciseSessionDto;
 import com.github.seanv.gymtracker.dto.ProgramDayExerciseDto;
+import com.github.seanv.gymtracker.dto.input.ExerciseSessionInputDto;
 import com.github.seanv.gymtracker.exception.model.ApiError;
 import com.github.seanv.gymtracker.services.ExerciseSessionService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -43,7 +44,7 @@ public class ExerciseSessionController {
     }
 
     @PostMapping()
-    public ResponseEntity<ExerciseSessionDto> logExercisesSession(@RequestBody ExerciseSessionDto dto){
+    public ResponseEntity<ExerciseSessionDto> logExercisesSession(@RequestBody ExerciseSessionInputDto dto){
         return null;
     }
 

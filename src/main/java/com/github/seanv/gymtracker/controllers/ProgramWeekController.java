@@ -37,11 +37,11 @@ public class ProgramWeekController {
             @ApiResponse(responseCode = "500", description = "Something went wrong...", content = @Content(mediaType = "Application.json", schema = @Schema(implementation = ApiError.class)))
     })
     @Operation(description = "Getting Program week by Program Id and week number")
-    @GetMapping("/{programId}/week/{weekNumber}")
+    @GetMapping("/{programId}/week/{id}")
     public ResponseEntity<ProgramWeekDto> getProgramWeek(@PathVariable("programId") Long programId,
-                                                         @PathVariable("weekNumber") Integer weekNumber) {
+                                                         @PathVariable("id") Long id) {
 
-        return ResponseEntity.status(HttpStatus.FOUND).body(service.getProgramWeek(programId, weekNumber));
+        return ResponseEntity.status(HttpStatus.FOUND).body(service.getProgramWeek(programId, id));
     }
 
     @ApiResponses(value = {

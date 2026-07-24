@@ -5,7 +5,7 @@ import jakarta.validation.constraints.NotBlank;
 import java.util.List;
 
 public record ProgramDayInputDto(
-        @NotBlank String muscleGroups,
+        @NotBlank String muscleGroup,
         List<ProgramDayExerciseInputDto> programDayExercises
 ) {
 }

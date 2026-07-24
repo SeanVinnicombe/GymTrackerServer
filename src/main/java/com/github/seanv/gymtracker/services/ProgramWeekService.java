@@ -50,9 +50,9 @@ public class ProgramWeekService {
         this.mapper = mapper;
     }
 
-    public ProgramWeekDto getProgramWeek(Long programId, Integer weekNumber) {
+    public ProgramWeekDto getProgramWeek(Long programId, Long weekNumber) {
 
-        var result = repository.findByProgram_IdAndWeekNumber(programId, weekNumber);
+        var result = repository.findByProgram_IdAndId(programId, weekNumber);
         result.getProgramDays().forEach(
                 i -> i.setProgramDayExercises(i.getProgramDayExercises()
                         .stream()

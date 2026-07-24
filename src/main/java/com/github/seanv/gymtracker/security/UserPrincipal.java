@@ -60,4 +60,8 @@ public class UserPrincipal implements UserDetails {
     public boolean isCredentialsNonExpired(){
         return true;
     }
+
+    public Long getId(){
+        return user.getId();
+    }
 }

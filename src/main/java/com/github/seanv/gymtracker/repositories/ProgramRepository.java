@@ -27,4 +27,6 @@ public interface ProgramRepository extends JpaRepository<Program, Long> {
             """
     )
     Optional<Program> findByIdWithProgramWeeks(@Param("id")Long id);
+
+    Optional<Program> findProgramByUser_IdAndStatus_Active(Long id);
 }
