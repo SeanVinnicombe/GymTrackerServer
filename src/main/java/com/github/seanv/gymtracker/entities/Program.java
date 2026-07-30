@@ -27,6 +27,7 @@ public class Program {
     @Column(name = "program_length")
     private Integer programLength;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "status")
     private ProgramStatus status;
 

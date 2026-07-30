@@ -1,9 +1,11 @@
 package com.github.seanv.gymtracker.builders.dtos.exerciseSession;
 
 import com.github.seanv.gymtracker.builders.dtos.set.SetInputDtoBuilder;
+import com.github.seanv.gymtracker.builders.entities.ProgramDayExerciseBuilder;
 import com.github.seanv.gymtracker.dto.input.ExerciseSessionInputDto;
 import com.github.seanv.gymtracker.dto.input.SetInputDto;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,6 +30,7 @@ public class ExerciseSessionInputDtoBuilder {
             sets.add(SetInputDtoBuilder.aSetInputDtoBuilder().build());
         }
 
-        return new ExerciseSessionInputDto(sets, notes);
+        var pde = ProgramDayExerciseBuilder.aProgramDayExerciseBuilder().build();
+        return new ExerciseSessionInputDto(sets, notes, pde.getId(), LocalDateTime.now());
     }
 }

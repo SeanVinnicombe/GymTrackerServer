@@ -5,18 +5,23 @@ import com.github.seanv.gymtracker.dto.ProgramDto;
 import com.github.seanv.gymtracker.dto.input.ProgramDayExerciseInputDto;
 import com.github.seanv.gymtracker.dto.input.ProgramDayInputDto;
 import com.github.seanv.gymtracker.dto.input.ProgramInputDto;
+import com.github.seanv.gymtracker.dto.update.ProgramUpdateDto;
 import com.github.seanv.gymtracker.entities.*;
+import com.github.seanv.gymtracker.entities.enums.ProgramStatus;
 import com.github.seanv.gymtracker.exception.type.ProgramNotFoundException;
 import com.github.seanv.gymtracker.mappers.ExerciseMapper;
 import com.github.seanv.gymtracker.mappers.ProgramMapper;
 import com.github.seanv.gymtracker.repositories.ProgramRepository;
 import com.github.seanv.gymtracker.security.SecurityService;
+import com.github.seanv.gymtracker.services.sync.ProgramSynchronizer;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Service
 public class ProgramService {
@@ -28,6 +33,7 @@ public class ProgramService {
     private final ExerciseService exerciseService;
     private final ExerciseMapper exerciseMapper;
     private final SecurityService securityService;
+    private final ProgramSynchronizer programSynchronizer;
 
     @Autowired
     public ProgramService(ProgramRepository programRepository,
@@ -36,7 +42,8 @@ public class ProgramService {
                            UserService userService,
                            ExerciseService exerciseService,
                            ExerciseMapper exerciseMapper,
-                          SecurityService securityService
+                          SecurityService securityService,
+                          ProgramSynchronizer programSynchronizer
 
     ){
         this.programRepository = programRepository;
@@ -46,6 +53,7 @@ public class ProgramService {
         this.exerciseService = exerciseService;
         this.exerciseMapper = exerciseMapper;
         this.securityService = securityService;
+        this.programSynchronizer = programSynchronizer;
     }
 
     /**
@@ -105,19 +113,31 @@ public class ProgramService {
         Program program = new Program();
         program.setUser(userService.getUserEntity(1L));
         List<ProgramWeek> programWeeks = new ArrayList<>();
-        List<ProgramDay> programDays = new ArrayList<>();
+
         program.setName(inputDto.name());
+        program.setStatus(ProgramStatus.INACTIVE);
         program.setProgramLength(inputDto.numberOfWeeks());
-        int weekCount = 0;
+        program.setCreatedAt(LocalDateTime.now());
+        program.setUpdatedAt(LocalDateTime.now());
+        AtomicInteger weekCount = new AtomicInteger(0);
+
+
+
         for(int i = 0; i < inputDto.numberOfWeeks(); i++){
             ProgramWeek programWeek = new ProgramWeek();
             programWeek.setProgram(program);
-            programWeek.setWeekNumber(++weekCount);
-            for(ProgramDayInputDto pd : inputDto.programWeeks().get(i).programDays()){
+            programWeek.setWeekNumber(weekCount.getAndIncrement() + 1);
+
+            List<ProgramDay> programDays = new ArrayList<>();
+            AtomicInteger dayOrder = new AtomicInteger(0);
+            for(ProgramDayInputDto pd : inputDto.programDays()){
                 ProgramDay programDay = new ProgramDay();
+                programDay.setProgramWeek(programWeek);
+                programDay.setDayOrder(dayOrder.getAndIncrement() + 1);
                 programDay.setMuscleGroup(pd.muscleGroup());
                 List<ProgramDayExercise> programDayExercises = new ArrayList<>();
                 int exerciseCount = 0;
+
                 for(ProgramDayExerciseInputDto pde : pd.programDayExercises()){
                     ProgramDayExercise programDayExercise = new ProgramDayExercise();
                     programDayExercise.setProgramDay(programDay);
@@ -131,11 +151,31 @@ public class ProgramService {
                 programDay.setProgramDayExercises(programDayExercises);
                 programDays.add(programDay);
             }
+            programWeek.setCreatedAt(LocalDateTime.now());
+            programWeek.setUpdatedAt(LocalDateTime.now());
             programWeek.setProgramDays(programDays);
             programWeeks.add(programWeek);
         }
         program.setProgramWeeks(programWeeks);
 
-        return mapper.toDto(programRepository.save(program));
+        var a = programRepository.save(program);
+
+        return mapper.toDto(a);
+    }
+
+    public ProgramDto updateProgram(ProgramUpdateDto inputDto){
+        Program program = programRepository.findById(inputDto.id()).orElseThrow(() -> new ProgramNotFoundException(inputDto.id()));
+        programSynchronizer.synchronize(program, inputDto);
+        return mapper.toDto(program);
+    }
+
+
+
+    public Boolean activateProgram(Long programId) {
+        Program program = programRepository.findById(programId).orElseThrow(() -> new ProgramNotFoundException(programId));
+        program.setStatus(ProgramStatus.ACTIVE);
+        var a = programRepository.save(program);
+
+        return a.getStatus() == ProgramStatus.ACTIVE;
     }
 }

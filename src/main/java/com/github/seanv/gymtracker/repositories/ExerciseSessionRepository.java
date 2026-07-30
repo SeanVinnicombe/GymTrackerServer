@@ -13,7 +13,7 @@ public interface ExerciseSessionRepository extends JpaRepository<ExerciseSession
 
     Boolean existsByProgramDayExercise_Id(Long id);
 
-    Optional<ExerciseSession> findByProgramDayExercise_IdAndWeekNumber(Long id, int weekNumber);
+//    Optional<ExerciseSession> findByProgramDayExercise_IdAndWeekNumber(Long id, int weekNumber);
 
     /**
      * NB -> Use @Modyfying(JPA import otherwise it will still be treated as query with JDBC import)when deleting
@@ -32,8 +32,8 @@ public interface ExerciseSessionRepository extends JpaRepository<ExerciseSession
      * Bulk operations:
      * 1. Basically just gives sql to db and tells it to execute, that's it
      */
-    @Modifying
-    void deleteByProgramDayExercise_IdAndWeekNumber(@Param("id") Long id, @Param("weekNumber") int weekNumber);
+//    @Modifying
+//    void deleteByProgramDayExercise_IdAndWeekNumber(@Param("id") Long id, @Param("weekNumber") int weekNumber);
 
-    Boolean existsByProgramDayExercise_IdAndWeekNumber(Long id, int weekNumber);
+//    Boolean existsByProgramDayExercise_IdAndWeekNumber(Long id, int weekNumber);
 }

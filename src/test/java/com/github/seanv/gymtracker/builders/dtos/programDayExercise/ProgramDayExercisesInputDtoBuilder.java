@@ -31,6 +31,6 @@ public class ProgramDayExercisesInputDtoBuilder {
         for (int i = 0; i < sessionsCount; i++){
             sessions.add(ExerciseSessionInputDtoBuilder.aExerciseSessionInputDtoBuilder().build());
         }
-        return new ProgramDayExerciseInputDto(exerciseId,exerciseNumber, targetSets,targerReps, sessions);
+        return new ProgramDayExerciseInputDto(exerciseId,exerciseNumber, targetSets,targerReps);
     }
 }

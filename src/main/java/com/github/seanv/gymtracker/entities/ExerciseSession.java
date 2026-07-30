@@ -28,9 +28,6 @@ public class ExerciseSession {
     @OneToMany(mappedBy = "exerciseSession", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Set> sets = new ArrayList<>();
 
-    @Column (name = "week_number")
-    private Integer weekNumber;
-
     @Column(name = "performed_at")
     private LocalDateTime performedAt;
 

@@ -47,6 +47,7 @@ CREATE TABLE public.program_week
     started_at   timestamp NULL,
     created_at  timestamp NULL,
     updated_at  timestamp NULL,
+    completed_at  timestamp NULL,
     CONSTRAINT program_week_pkey PRIMARY KEY (id),
     CONSTRAINT program_week_program_fk FOREIGN KEY (program_id) REFERENCES public."program" (id)
 );
@@ -56,6 +57,7 @@ CREATE TABLE public.program_day
     id              int8         NOT NULL,
     muscle_group    varchar(255) NOT NULL,
     program_week_id int8         NOT NULL,
+    day_order        int8         NOT NULL,
     is_completed    bool NULL,
     updated_at      timestamp NULL,
     CONSTRAINT program_day_pkey PRIMARY KEY (id),
@@ -81,7 +83,6 @@ CREATE TABLE public.exercise_session
 (
     id                      int8 NOT NULL,
     notes                   varchar(255) NULL,
-    week_number             int4 NULL,
     program_day_exercise_id int8 NULL,
     performed_at            timestamp NULL,
     created_at              timestamp NULL,

@@ -10,7 +10,7 @@ import java.util.List;
 @NoArgsConstructor
 public class ProgramDayExerciseDto {
 
-    private Integer exerciseNumber;
+    private Integer exerciseOrder;
     private String exerciseName;
     private Integer targetSets;
     private Integer targetReps;

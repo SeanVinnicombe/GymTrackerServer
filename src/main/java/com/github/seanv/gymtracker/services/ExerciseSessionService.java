@@ -48,11 +48,11 @@ public class ExerciseSessionService {
     @Transactional
     public void deleteByProgramDayExerciseIdAndWeekNumberIfExists(Long id, int weekNumber){
 
-        ExerciseSession es = repository.findByProgramDayExercise_IdAndWeekNumber(id, weekNumber).orElse(null);
-        if (es != null){
-            repository.deleteById(es.getId());
-            repository.flush();
-        }
+//        ExerciseSession es = repository.findByProgramDayExercise_IdAndWeekNumber(id, weekNumber).orElse(null);
+//        if (es != null){
+//            repository.deleteById(es.getId());
+//            repository.flush();
+//        }
     }
 
     /**
@@ -66,9 +66,9 @@ public class ExerciseSessionService {
      * executes, and there's no matching data then 0 rows are deleted - no harm no foul
      */
 
-    public Boolean existsByProgramDayExerciseIdAndWeekNumber(Long id, int weekNumber){
-        return repository.existsByProgramDayExercise_IdAndWeekNumber(id, weekNumber);
-    }
+//    public Boolean existsByProgramDayExerciseIdAndWeekNumber(Long id, int weekNumber){
+//        return repository.existsByProgramDayExercise_IdAndWeekNumber(id, weekNumber);
+//    }
 
     public ExerciseSessionDto logExerciseSession(ExerciseSessionInputDto dto){
 

@@ -37,12 +37,6 @@ public class Exercise {
      * actual Enum value as db won't know what it is, that's why we use string version
      */
 
-    @ManyToMany(mappedBy = "exercises")
-    private Set<ProgramDay> programDays = new HashSet<>();
-
-    @OneToMany(mappedBy = "exercise")
-    private List<ProgramDayExercise> programDayExercise;
-
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;

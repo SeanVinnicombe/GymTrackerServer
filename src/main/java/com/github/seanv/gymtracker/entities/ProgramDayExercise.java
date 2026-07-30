@@ -50,8 +50,6 @@ public class ProgramDayExercise {
      * Orphan removal always belong to parent - tells hibernate if item was removed from collection and has to link to a parent anymore
      * then remove from DB on my behalf
      */
-    @OneToMany(mappedBy = "programDayExercise", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ExerciseSession> exerciseSession;
 
     @Override
     public boolean equals(Object o) {
@@ -75,14 +73,4 @@ public class ProgramDayExercise {
      * if we remove it from list, that's only half the job, as we need to also severe the link to any parent reference
      * otherwise Hibernate doesn't pick it up as orphan and then keeps it in DB
      */
-
-    public void removeExerciseSession(ExerciseSession es){
-        exerciseSession.remove(es);
-        es.setProgramDayExercise(null);
-    }
-
-    public void addExerciseSession(ExerciseSession es){
-        exerciseSession.add(es);
-        es.setProgramDayExercise(this);
-    }
 }

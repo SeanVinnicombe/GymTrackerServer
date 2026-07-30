@@ -86,11 +86,11 @@ public class GlobalControllerExceptionHandler {
 //    }
 
     @ExceptionHandler(UserAlreadyExistsException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseStatus(HttpStatus.CONFLICT)
     public ApiError handleUserAlreadyExistsException(UserAlreadyExistsException ex){
         return new ApiError(
-                HttpStatus.BAD_REQUEST.value(),
-                HttpStatus.BAD_REQUEST.name(),
+                HttpStatus.CONFLICT.value(),
+                HttpStatus.CONFLICT.name(),
                 ex.getMessage(),
                 LocalDateTime.now()
         );
@@ -135,6 +135,19 @@ public class GlobalControllerExceptionHandler {
     }
 
     // ==================== PROGRAM DAY ====================
+
+    @ExceptionHandler(ProgramDayNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ApiError handleProgramDayNotFound(ProgramDayNotFoundException ex){
+        return new ApiError(
+                HttpStatus.NOT_FOUND.value(),
+                HttpStatus.NOT_FOUND.name(),
+                ex.getMessage(),
+                LocalDateTime.now()
+        );
+    }
+
+    // ==================== PROGRAM DAY EXERCISE====================
 
     @ExceptionHandler(ProgramDayExerciseNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)

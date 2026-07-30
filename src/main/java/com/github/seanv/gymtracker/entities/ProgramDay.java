@@ -26,6 +26,9 @@ public class ProgramDay {
     @Column(name = "muscle_group")
     private String muscleGroup;
 
+    @Column(name = "day_order")
+    private Integer dayOrder;
+
     @ManyToOne
     @JoinColumn(name = "program_week_id", nullable = false)
     @NotNull
@@ -36,14 +39,6 @@ public class ProgramDay {
 
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
-
-    @ManyToMany
-    @JoinTable(
-            name = "program_day_exercise",
-            joinColumns = @JoinColumn(name = "program_day_id"),
-            inverseJoinColumns = @JoinColumn(name = "exercise_id")
-    )
-    private Set<Exercise> exercises = new HashSet<>();
 
     @OneToMany(mappedBy = "programDay", cascade = CascadeType.ALL)
     private List<ProgramDayExercise> programDayExercises;

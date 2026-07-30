@@ -2,6 +2,7 @@ package com.github.seanv.gymtracker.security;
 
 import com.github.seanv.gymtracker.entities.Program;
 import com.github.seanv.gymtracker.entities.User;
+import com.github.seanv.gymtracker.entities.enums.ProgramStatus;
 import com.github.seanv.gymtracker.exception.type.NoActiveProgramException;
 import com.github.seanv.gymtracker.repositories.ProgramDayExerciseRepository;
 import com.github.seanv.gymtracker.repositories.ProgramRepository;
@@ -54,7 +55,7 @@ public class SecurityService implements UserDetailsService {
     public Boolean programDayOwnershipCheck(Long pdeId){
         UserPrincipal principal = getCurrentUserPrincipal();
         Program activeUserProgram = programRepository
-                .findProgramByUser_IdAndStatus_Active(principal.getId())
+                .findProgramByUser_IdAndStatus(principal.getId(), ProgramStatus.ACTIVE)
                 .orElseThrow(NoActiveProgramException::new);
 
         return pdeRepository.existsByIdAndProgramId(pdeId, activeUserProgram.getId());

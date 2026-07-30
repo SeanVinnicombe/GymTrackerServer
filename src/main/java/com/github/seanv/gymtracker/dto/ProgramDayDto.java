@@ -12,6 +12,7 @@ import java.util.Set;
 public class ProgramDayDto {
 
     private Long id;
+    private Integer dayOrder;
     private String muscleGroup;
     private List<ProgramDayExerciseDto> programDayExercises;
 }

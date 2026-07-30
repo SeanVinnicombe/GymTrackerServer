@@ -29,7 +29,8 @@ public class ProgramWeek {
     @Column(name = "week_number")
     private Integer weekNumber;
 
-    @OneToMany(mappedBy = "programWeek")
+
+    @OneToMany(mappedBy = "programWeek", cascade = CascadeType.ALL)
     private List<ProgramDay> programDays;
 
     @Column(name = "started_at")
@@ -40,4 +41,7 @@ public class ProgramWeek {
 
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+
+    @Column(name = "completed_at")
+    private LocalDateTime completedAt;
 }

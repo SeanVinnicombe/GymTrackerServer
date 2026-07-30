@@ -79,16 +79,16 @@ VALUES (1, 1, 1, '2024-01-01 09:00:00', '2024-01-01 08:00:00', '2024-01-07 18:00
 -- ==================== program_day ====================
 -- Days 1-6 (week 1 and first part of week 2) are marked complete; the rest are still pending.
 
-INSERT INTO public.program_day (id, muscle_group, program_week_id, is_completed, updated_at)
-VALUES (1, 'Chest/Shoulder', 1, true, '2024-01-01 10:30:00'),
-       (2, 'Back/Shoulder', 1, true, '2024-01-03 10:30:00'),
-       (3, 'Legs', 1, true, '2024-01-05 10:30:00'),
-       (4, 'Arms', 1, true, '2024-01-07 10:30:00'),
-       (5, 'Chest/Triceps', 2, true, '2024-01-08 10:30:00'),
-       (6, 'Back/Biceps', 2, true, '2024-01-10 10:30:00'),
-       (7, 'Legs', 2, false, NULL),
-       (8, 'Shoulders', 2, false, NULL),
-       (9, 'Arms', 2, false, NULL);
+INSERT INTO public.program_day (id, muscle_group, program_week_id, day_order, is_completed, updated_at)
+VALUES (1, 'Chest/Shoulder', 1,1, true, '2024-01-01 10:30:00'),
+       (2, 'Back/Shoulder', 1,2, true, '2024-01-03 10:30:00'),
+       (3, 'Legs', 1, 3, true, '2024-01-05 10:30:00'),
+       (4, 'Arms', 1, 4, true, '2024-01-07 10:30:00'),
+       (5, 'Chest/Triceps', 2,1 , true, '2024-01-08 10:30:00'),
+       (6, 'Back/Biceps', 2, 2, true, '2024-01-10 10:30:00'),
+       (7, 'Legs', 2, 3, false, NULL),
+       (8, 'Shoulders', 2,4 , false, NULL),
+       (9, 'Arms', 2,5 , false, NULL);
 
 -- ==================== program_day_exercise ====================
 -- Note: "exercise_number" was renamed to "exercise_order" in the new schema.
@@ -124,11 +124,11 @@ VALUES (21, 3, 8, 3, 17, 4, '2024-01-01 08:00:00', '2024-01-01 08:00:00'),
 -- ==================== exercise_session ====================
 -- A handful of logged sessions across week 1 and the start of week 2.
 
-INSERT INTO public.exercise_session (id, notes, week_number, program_day_exercise_id, performed_at, created_at, updated_at)
-VALUES (1, 'Stayed strong through all sets', 1, 1, '2024-01-01 10:00:00', '2024-01-01 10:15:00', '2024-01-01 10:15:00'),
-       (2, 'Shoulders felt tight', 1, 2, '2024-01-01 10:20:00', '2024-01-01 10:35:00', '2024-01-01 10:35:00'),
-       (3, 'New PR on pull ups', 1, 7, '2024-01-03 09:00:00', '2024-01-03 09:20:00', '2024-01-03 09:20:00'),
-       (4, 'Slight improvement from last week', 2, 1, '2024-01-08 10:00:00', '2024-01-08 10:15:00', '2024-01-08 10:15:00');
+INSERT INTO public.exercise_session (id, notes, program_day_exercise_id, performed_at, created_at, updated_at)
+VALUES (1, 'Stayed strong through all sets', 1, '2024-01-01 10:00:00', '2024-01-01 10:15:00', '2024-01-01 10:15:00'),
+       (2, 'Shoulders felt tight', 2, '2024-01-01 10:20:00', '2024-01-01 10:35:00', '2024-01-01 10:35:00'),
+       (3, 'New PR on pull ups', 7, '2024-01-03 09:00:00', '2024-01-03 09:20:00', '2024-01-03 09:20:00'),
+       (4, 'Slight improvement from last week', 1, '2024-01-08 10:00:00', '2024-01-08 10:15:00', '2024-01-08 10:15:00');
 
 -- ==================== set ====================
 

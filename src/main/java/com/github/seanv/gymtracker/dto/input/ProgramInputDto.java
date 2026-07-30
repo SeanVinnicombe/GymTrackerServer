@@ -9,6 +9,6 @@ import java.util.List;
 public record ProgramInputDto(
         @NotBlank String name,
         @NotNull Integer numberOfWeeks,
-        List<ProgramWeekInputDto> programWeeks
+        List<ProgramDayInputDto> programDays
 ) {
 }

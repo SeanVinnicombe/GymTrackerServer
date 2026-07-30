@@ -33,7 +33,7 @@ CREATE SEQUENCE public.program_day_seq
     NO MAXVALUE
     CACHE 1;
 
-CREATE SEQUENCE public.program_day_exercises_seq
+CREATE SEQUENCE public.program_day_exercise_seq
     INCREMENT BY 1
     START WITH 25
     MINVALUE 1

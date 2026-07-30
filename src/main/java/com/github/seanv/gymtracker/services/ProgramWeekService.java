@@ -133,24 +133,25 @@ public class ProgramWeekService {
                                                           ProgramDayExercise programDayExercise,
                                                           int weekNumber){
 
-        List<ExerciseSession> sessions = programDayExercise.getExerciseSession();
-
-        if (inputDto.exerciseSession() != null){
-            ExerciseSession es = sessions.stream().filter( i -> i.getWeekNumber()
-                    .equals(weekNumber))
-                    .findFirst()
-                    .orElse(null);
-
-            if (es != null){
-                programDayExercise.removeExerciseSession(es);
-            }
-            ExerciseSession exerciseSession = convertToExerciseSession(inputDto.exerciseSession(),
-                    programDayExercise,
-                    weekNumber);
-            programDayExercise.addExerciseSession(exerciseSession);
-        }
-
-        return programDayExercise;
+//        List<ExerciseSession> sessions = programDayExercise.getExerciseSession();
+//
+//        if (inputDto.exerciseSession() != null){
+//            ExerciseSession es = sessions.stream().filter( i -> i.get()
+//                    .equals(weekNumber))
+//                    .findFirst()
+//                    .orElse(null);
+//
+//            if (es != null){
+//                programDayExercise.removeExerciseSession(es);
+//            }
+//            ExerciseSession exerciseSession = convertToExerciseSession(inputDto.exerciseSession(),
+//                    programDayExercise,
+//                    weekNumber);
+//            programDayExercise.addExerciseSession(exerciseSession);
+//        }
+//
+//        return programDayExercise;
+        return null;
     }
 
     /***
@@ -162,36 +163,36 @@ public class ProgramWeekService {
      *
      */
 
-    public ExerciseSession convertToExerciseSession(ExerciseSessionUpdateDto inputDto,
-                                                    ProgramDayExercise programDayExercise,
-                                                    int weekNumber){
-
-
-        ExerciseSession exerciseSession = new ExerciseSession();
-        exerciseSession.setNotes(inputDto.notes());
-        List<Set> sets = new ArrayList<>();
-        exerciseSession.setSets(sets);
-        exerciseSession.setWeekNumber(weekNumber);
-
-        for (SetUpdateDto set : inputDto.sets()){
-            Set result = convertToSet(set, exerciseSession);
-            sets.add(result);
-        }
-
-        exerciseSession.setProgramDayExercise(programDayExercise);
-        return exerciseSession;
-    }
-
-    public Set convertToSet(SetUpdateDto inputDto, ExerciseSession exerciseSession){
-
-        Set set = new Set();
-
-        set.setSetOrder(inputDto.setOrder());
-        set.setAchievedReps(inputDto.achievedReps());
-        set.setWeightDone(inputDto.weightDone());
-        set.setExerciseSession(exerciseSession);
-
-        return set;
-    }
+//    public ExerciseSession convertToExerciseSession(ExerciseSessionUpdateDto inputDto,
+//                                                    ProgramDayExercise programDayExercise,
+//                                                    int weekNumber){
+//
+//
+//        ExerciseSession exerciseSession = new ExerciseSession();
+//        exerciseSession.setNotes(inputDto.notes());
+//        List<Set> sets = new ArrayList<>();
+//        exerciseSession.setSets(sets);
+//        exerciseSession.setWeekNumber(weekNumber);
+//
+//        for (SetUpdateDto set : inputDto.sets()){
+//            Set result = convertToSet(set, exerciseSession);
+//            sets.add(result);
+//        }
+//
+//        exerciseSession.setProgramDayExercise(programDayExercise);
+//        return exerciseSession;
+//    }
+//
+//    public Set convertToSet(SetUpdateDto inputDto, ExerciseSession exerciseSession){
+//
+//        Set set = new Set();
+//
+//        set.setSetOrder(inputDto.setOrder());
+//        set.setAchievedReps(inputDto.achievedReps());
+//        set.setWeightDone(inputDto.weightDone());
+//        set.setExerciseSession(exerciseSession);
+//
+//        return set;
+//    }
 
 }

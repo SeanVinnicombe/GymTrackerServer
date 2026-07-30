@@ -13,7 +13,7 @@ public class ProgramInputDtoBuilder {
 
     private String name = "Strength";
     private Integer numberOfWeeks = 8;
-    private List<ProgramWeekInputDto> programWeeks = new ArrayList<>();
+    private List<ProgramDayInputDto> programDays = new ArrayList<>();
     private int programDaysCount = 5;
 
 
@@ -29,10 +29,10 @@ public class ProgramInputDtoBuilder {
     public ProgramInputDto build(){
 
         for (int i = 0 ; i < programDaysCount; i++){
-            programWeeks.add(ProgramWeekInputDtoBuilder.aProgramWeekInputDtoBuilder().build());
+            programDays.add(ProgramDaysInputDtoBuilder.aProgramDaysInputDto().build());
         }
 
-        return new ProgramInputDto(name,numberOfWeeks,programWeeks);
+        return new ProgramInputDto(name,numberOfWeeks, programDays);
     }
 
 }

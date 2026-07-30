@@ -6,6 +6,7 @@ import com.github.seanv.gymtracker.dto.update.ProgramWeekUpdateDto;
 import com.github.seanv.gymtracker.entities.ProgramWeek;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 
 @Mapper(componentModel = "spring",
 uses = {ProgramDayMapper.class})
@@ -19,4 +20,6 @@ public interface ProgramWeekMapper {
 
     @Mapping(target = "programId", source = "program.id")
     ProgramWeekDto toDto(ProgramWeek programWeek);
+
+    void updateProgramWeek(ProgramWeekUpdateDto dto, @MappingTarget ProgramWeek programWeek);
 }

@@ -3,6 +3,7 @@ package com.github.seanv.gymtracker.controllers;
 import com.github.seanv.gymtracker.dto.ProgramDto;
 import com.github.seanv.gymtracker.dto.ProgramsResponse;
 import com.github.seanv.gymtracker.dto.input.ProgramInputDto;
+import com.github.seanv.gymtracker.dto.update.ProgramUpdateDto;
 import com.github.seanv.gymtracker.exception.model.ApiError;
 import com.github.seanv.gymtracker.services.ProgramService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -100,15 +101,19 @@ public class ProgramController {
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = ApiError.class)))
     })
-    @PatchMapping("/{id}")
-    public ResponseEntity<ProgramDto> updateProgram(@RequestBody ProgramInputDto inputDto, @PathVariable String id) {
-        return ResponseEntity.status(HttpStatus.OK).body(programService.createProgram(inputDto));
+    @PatchMapping()
+    public ResponseEntity<ProgramDto> updateProgram(@RequestBody ProgramUpdateDto inputDto) {
+        return ResponseEntity.status(HttpStatus.OK).body(programService.updateProgram(inputDto));
     }
 
     @Operation(description = "Activating a program")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Program successfully activated",
+                content = @Content(mediaType = "application.json", schema = @Schema(implementation = Boolean.class)))
+    })
     @PatchMapping("/{id}/activate")
     public ResponseEntity<Boolean> activateProgram(@PathVariable Long id){
-        return null;
+        return ResponseEntity.status(HttpStatus.OK).body(programService.activateProgram(id));
     }
 
     @Operation(description = "Deleting a program")
