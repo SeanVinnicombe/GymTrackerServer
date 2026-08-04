@@ -1,5 +1,6 @@
 package com.github.seanv.gymtracker.services.sync;
 
+import com.github.seanv.gymtracker.dto.ExerciseDto;
 import com.github.seanv.gymtracker.dto.input.ProgramDayExerciseInputDto;
 import com.github.seanv.gymtracker.dto.input.ProgramDayInputDto;
 import com.github.seanv.gymtracker.dto.input.ProgramInputDto;
@@ -7,18 +8,14 @@ import com.github.seanv.gymtracker.dto.input.ProgramWeekInputDto;
 import com.github.seanv.gymtracker.dto.update.ProgramDayExerciseUpdateDto;
 import com.github.seanv.gymtracker.dto.update.ProgramDayUpdateDto;
 import com.github.seanv.gymtracker.dto.update.ProgramUpdateDto;
-import com.github.seanv.gymtracker.entities.Program;
-import com.github.seanv.gymtracker.entities.ProgramDay;
-import com.github.seanv.gymtracker.entities.ProgramDayExercise;
-import com.github.seanv.gymtracker.entities.ProgramWeek;
+import com.github.seanv.gymtracker.entities.*;
 import com.github.seanv.gymtracker.exception.type.ProgramDayExerciseNotFoundException;
 import com.github.seanv.gymtracker.exception.type.ProgramDayNotFoundException;
-import com.github.seanv.gymtracker.mappers.ProgramDayExerciseMapper;
-import com.github.seanv.gymtracker.mappers.ProgramDayMapper;
-import com.github.seanv.gymtracker.mappers.ProgramMapper;
-import com.github.seanv.gymtracker.mappers.ProgramWeekMapper;
+import com.github.seanv.gymtracker.mappers.*;
+import com.github.seanv.gymtracker.repositories.ExerciseRepository;
 import com.github.seanv.gymtracker.repositories.ProgramDayExerciseRepository;
 import com.github.seanv.gymtracker.repositories.ProgramDayRepository;
+import com.github.seanv.gymtracker.services.ExerciseService;
 import com.github.seanv.gymtracker.services.ProgramService;
 import org.springframework.stereotype.Component;
 
@@ -36,17 +33,23 @@ public class ProgramSynchronizer {
     private final ProgramDayRepository programDayRepository;
     private final ProgramDayExerciseMapper programDayExerciseMapper;
     private final ProgramDayExerciseRepository programDayExerciseRepository;
+    private final ExerciseRepository exerciseRepository;
+    private final ExerciseService exerciseService;
+    private final ExerciseMapper exerciseMapper;
 
     public ProgramSynchronizer(ProgramMapper programMapper,
                                ProgramWeekMapper programWeekMapper,
                                ProgramDayMapper programDayMapper,
                                ProgramDayRepository programDayRepository,
-                               ProgramDayExerciseMapper programDayExerciseMapper, ProgramDayExerciseRepository programDayExerciseRepository) {
+                               ProgramDayExerciseMapper programDayExerciseMapper, ProgramDayExerciseRepository programDayExerciseRepository, ExerciseRepository exerciseRepository, ExerciseService exerciseService, ExerciseMapper exerciseMapper) {
         this.programMapper = programMapper;
         this.programDayMapper = programDayMapper;
         this.programDayRepository = programDayRepository;
         this.programDayExerciseMapper = programDayExerciseMapper;
         this.programDayExerciseRepository = programDayExerciseRepository;
+        this.exerciseRepository = exerciseRepository;
+        this.exerciseService = exerciseService;
+        this.exerciseMapper = exerciseMapper;
     }
 
     public void synchronize(Program program, ProgramUpdateDto dto) {
@@ -62,9 +65,9 @@ public class ProgramSynchronizer {
                 .collect(Collectors.toMap(ProgramDayUpdateDto::programDayId, Function.identity()));
 
         List<ProgramDay> updatedList = new ArrayList<>();
-        for (ProgramDayUpdateDto pd : dto){
+        for (ProgramDayUpdateDto pd : dto) {
 
-            if (pd.programDayId() == null){ // new item
+            if (pd.programDayId() == null) { // new item
                 ProgramDay p = new ProgramDay();
                 programDayMapper.updateProgramDay(pd, p);
                 updatedList.add(p);
@@ -97,12 +100,17 @@ public class ProgramSynchronizer {
 
             if (pde.programDayExerciseId() == null) { // new item
                 ProgramDayExercise newEntity = new ProgramDayExercise();
+                Exercise exercise = exerciseMapper.fromDto(exerciseService.getExercise(pde.exerciseId()));
                 programDayExerciseMapper.updateProgramDayExercise(pde, newEntity);
+                newEntity.setExercise(exercise);
                 updatedList.add(newEntity);
                 continue;
             }
-
             ProgramDayExercise entity = programDayExerciseRepository.findById(pde.programDayExerciseId()).orElseThrow(() -> new ProgramDayExerciseNotFoundException(pde.programDayExerciseId()));
+            if (!pde.exerciseId().equals(entity.getExercise().getId())) {
+                Exercise exercise = exerciseMapper.fromDto(exerciseService.getExercise(pde.exerciseId()));
+                entity.setExercise(exercise);
+            }
             programDayExerciseMapper.updateProgramDayExercise(pde, entity);
 
             updatedList.add(entity);

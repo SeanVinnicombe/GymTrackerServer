@@ -75,7 +75,7 @@ public class ProgramController {
     @Operation(description = "Creating new Program")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Program successfully created",
-                    content = @Content(mediaType = "application.json",
+                    content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = ProgramDto.class))),
             @ApiResponse(responseCode = "400", description = "Invalid input was provided",
                     content = @Content(mediaType = "application/json",
@@ -92,7 +92,7 @@ public class ProgramController {
     @Operation(description = "Updating existing Program")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Program successfully updated",
-                    content = @Content(mediaType = "application.json",
+                    content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = ProgramDto.class))),
             @ApiResponse(responseCode = "400", description = "Invalid input was provided",
                     content = @Content(mediaType = "application/json",

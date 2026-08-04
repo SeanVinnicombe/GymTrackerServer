@@ -4,7 +4,7 @@ import com.github.seanv.gymtracker.dto.ProgramDayExerciseDto;
 
 public class ProgramDayExerciseDtoBuilder {
 
-    private Integer exerciseNumber = 1;
+    private Integer exerciseOrder = 1;
     private String exerciseName = "Bench press";
     private Integer targetSets = 3;
     private Integer targerReps = 6;
@@ -17,7 +17,7 @@ public class ProgramDayExerciseDtoBuilder {
         ProgramDayExerciseDto dto = new ProgramDayExerciseDto();
 
         dto.setExerciseName(exerciseName);
-        dto.setExerciseNumber(exerciseNumber);
+        dto.setExerciseOrder(exerciseOrder);
         dto.setTargetReps(targerReps);
         dto.setTargetSets(targetSets);
 

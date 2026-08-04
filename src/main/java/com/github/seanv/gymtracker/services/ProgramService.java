@@ -2,8 +2,6 @@ package com.github.seanv.gymtracker.services;
 
 import com.github.seanv.gymtracker.dto.ProgramDayDto;
 import com.github.seanv.gymtracker.dto.ProgramDto;
-import com.github.seanv.gymtracker.dto.input.ProgramDayExerciseInputDto;
-import com.github.seanv.gymtracker.dto.input.ProgramDayInputDto;
 import com.github.seanv.gymtracker.dto.input.ProgramInputDto;
 import com.github.seanv.gymtracker.dto.update.ProgramUpdateDto;
 import com.github.seanv.gymtracker.entities.*;
@@ -34,6 +32,7 @@ public class ProgramService {
     private final ExerciseMapper exerciseMapper;
     private final SecurityService securityService;
     private final ProgramSynchronizer programSynchronizer;
+    private final ProgramWeekService programWeekService;
 
     @Autowired
     public ProgramService(ProgramRepository programRepository,
@@ -43,9 +42,9 @@ public class ProgramService {
                            ExerciseService exerciseService,
                            ExerciseMapper exerciseMapper,
                           SecurityService securityService,
-                          ProgramSynchronizer programSynchronizer
+                          ProgramSynchronizer programSynchronizer,
 
-    ){
+                          ProgramWeekService programWeekService){
         this.programRepository = programRepository;
         this.mapper = mapper;
         this.programDayService = programDayService;
@@ -54,6 +53,7 @@ public class ProgramService {
         this.exerciseMapper = exerciseMapper;
         this.securityService = securityService;
         this.programSynchronizer = programSynchronizer;
+        this.programWeekService = programWeekService;
     }
 
     /**
@@ -122,38 +122,15 @@ public class ProgramService {
         AtomicInteger weekCount = new AtomicInteger(0);
 
 
-
         for(int i = 0; i < inputDto.numberOfWeeks(); i++){
             ProgramWeek programWeek = new ProgramWeek();
             programWeek.setProgram(program);
             programWeek.setWeekNumber(weekCount.getAndIncrement() + 1);
 
-            List<ProgramDay> programDays = new ArrayList<>();
-            AtomicInteger dayOrder = new AtomicInteger(0);
-            for(ProgramDayInputDto pd : inputDto.programDays()){
-                ProgramDay programDay = new ProgramDay();
-                programDay.setProgramWeek(programWeek);
-                programDay.setDayOrder(dayOrder.getAndIncrement() + 1);
-                programDay.setMuscleGroup(pd.muscleGroup());
-                List<ProgramDayExercise> programDayExercises = new ArrayList<>();
-                int exerciseCount = 0;
-
-                for(ProgramDayExerciseInputDto pde : pd.programDayExercises()){
-                    ProgramDayExercise programDayExercise = new ProgramDayExercise();
-                    programDayExercise.setProgramDay(programDay);
-                    var exercise = exerciseService.getExercise(pde.exerciseId());
-                    programDayExercise.setExercise(exerciseMapper.fromDto(exercise));
-                    programDayExercise.setExerciseOrder(++exerciseCount);
-                    programDayExercise.setTargetReps(pde.targetReps());
-                    programDayExercise.setTargetSets(pde.targetSets());
-                    programDayExercises.add(programDayExercise);
-                }
-                programDay.setProgramDayExercises(programDayExercises);
-                programDays.add(programDay);
-            }
+            List<ProgramDay> pdList = programDayService.buildProgramDays(inputDto.programDays(), programWeek);
+            programWeek.setProgramDays(pdList);
             programWeek.setCreatedAt(LocalDateTime.now());
             programWeek.setUpdatedAt(LocalDateTime.now());
-            programWeek.setProgramDays(programDays);
             programWeeks.add(programWeek);
         }
         program.setProgramWeeks(programWeeks);

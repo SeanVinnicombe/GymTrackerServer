@@ -6,7 +6,7 @@ import java.util.List;
 
 public record ProgramDayExerciseUpdateDto(Long programDayExerciseId,
                                           @NotNull Long exerciseId,
-                                          @NotNull Integer exerciseNumber,
+                                          @NotNull Integer exerciseOrder,
                                           @NotNull Integer targetSets,
                                           @NotNull Integer targetReps) {
 }

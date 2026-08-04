@@ -14,5 +14,4 @@ public class ProgramDayExerciseDto {
     private String exerciseName;
     private Integer targetSets;
     private Integer targetReps;
-    private List<ExerciseSessionDto> exerciseSession;
 }

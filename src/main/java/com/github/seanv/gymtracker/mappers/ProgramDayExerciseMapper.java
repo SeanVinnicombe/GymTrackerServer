@@ -1,6 +1,7 @@
 package com.github.seanv.gymtracker.mappers;
 
 import com.github.seanv.gymtracker.dto.ProgramDayExerciseDto;
+import com.github.seanv.gymtracker.dto.input.ProgramDayExerciseInputDto;
 import com.github.seanv.gymtracker.dto.update.ProgramDayExerciseUpdateDto;
 import com.github.seanv.gymtracker.entities.ProgramDay;
 import com.github.seanv.gymtracker.entities.ProgramDayExercise;
@@ -15,6 +16,8 @@ public interface ProgramDayExerciseMapper {
     ProgramDayExerciseDto toDto(ProgramDayExercise programDayExercise);
 
     ProgramDayExercise fromDto(ProgramDayExerciseDto dto);
+
+    ProgramDayExercise fromInputDto(ProgramDayExerciseInputDto dto);
 
     void updateProgramDayExercise(ProgramDayExerciseUpdateDto dto, @MappingTarget ProgramDayExercise programDayExercise);
 

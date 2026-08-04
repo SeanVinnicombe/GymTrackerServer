@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -152,6 +153,18 @@ public class ProgramWeekService {
 //
 //        return programDayExercise;
         return null;
+    }
+
+    public List<ProgramWeek> initializeWeeks(int weekCount) {
+        List<ProgramWeek> weeks = new ArrayList<>();
+        for (int i = 0; i < weekCount; i++) {
+            ProgramWeek week = new ProgramWeek();
+            week.setWeekNumber(i + 1);
+            week.setCreatedAt(LocalDateTime.now());
+            week.setUpdatedAt(LocalDateTime.now());
+            weeks.add(week);
+        }
+        return weeks;
     }
 
     /***

@@ -2,6 +2,7 @@ package com.github.seanv.gymtracker.repositories;
 
 import com.github.seanv.gymtracker.entities.Program;
 import com.github.seanv.gymtracker.entities.enums.ProgramStatus;
+import org.jspecify.annotations.NonNull;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -30,4 +31,11 @@ public interface ProgramRepository extends JpaRepository<Program, Long> {
     Optional<Program> findByIdWithProgramWeeks(@Param("id")Long id);
 
     Optional<Program> findProgramByUser_IdAndStatus(Long user_id, ProgramStatus status);
+
+
+    /**
+     * @EntityGraph tells JPA to fetch all the relationships eagerly, even though they are lazy loaded by default.
+     */
+    @EntityGraph(attributePaths = {"programWeeks", "programWeeks.programDays"})
+    Optional<Program> findById(@NonNull Long id);
 }
