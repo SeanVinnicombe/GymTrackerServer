@@ -1,9 +1,13 @@
 package com.github.seanv.gymtracker.security;
 
+import com.github.seanv.gymtracker.dto.UserDto;
+import com.github.seanv.gymtracker.dto.update.UserUpdateDto;
 import com.github.seanv.gymtracker.entities.Program;
 import com.github.seanv.gymtracker.entities.User;
 import com.github.seanv.gymtracker.entities.enums.ProgramStatus;
 import com.github.seanv.gymtracker.exception.type.NoActiveProgramException;
+import com.github.seanv.gymtracker.exception.type.UserNotFoundException;
+import com.github.seanv.gymtracker.mappers.UserMapper;
 import com.github.seanv.gymtracker.repositories.ProgramDayExerciseRepository;
 import com.github.seanv.gymtracker.repositories.ProgramRepository;
 import com.github.seanv.gymtracker.repositories.UserRepository;
@@ -23,14 +27,12 @@ import java.util.Objects;
 public class SecurityService implements UserDetailsService {
 
     private final UserRepository userRepository;
-    private final UserService userService;
     private final ProgramRepository programRepository;
     private final ProgramDayExerciseRepository pdeRepository;
 
     @Autowired
-    public SecurityService(UserRepository userRepository, UserService userService, ProgramRepository programRepository, ProgramDayExerciseRepository pdeRepository){
+    public SecurityService(UserRepository userRepository, ProgramRepository programRepository, ProgramDayExerciseRepository pdeRepository, UserMapper userMapper){
         this.userRepository = userRepository;
-        this.userService = userService;
         this.programRepository = programRepository;
         this.pdeRepository = pdeRepository;
     }
@@ -49,7 +51,8 @@ public class SecurityService implements UserDetailsService {
         UserPrincipal principal = getCurrentUserPrincipal();
         assert principal != null;
         String email = principal.getUsername();
-        return userService.getUserIdByEmail(email);
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException("No user found with email: " + email));
+        return user.getId();
     }
 
     public Boolean programDayOwnershipCheck(Long pdeId){
