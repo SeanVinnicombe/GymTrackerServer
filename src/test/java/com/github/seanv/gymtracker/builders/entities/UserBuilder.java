@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class UserBuilder {
+    private Long id = 1L;
     private String firstName = "Sean";
     private String lastName = "Vinnicombe";
     private String phoneNumber = "0761239876";
@@ -27,6 +28,7 @@ public class UserBuilder {
 
     public User build(){
         User user = new User();
+        user.setId(id);
         user.setFirstName(firstName);
         user.setLastName(lastName);
         user.setPhoneNumber(phoneNumber);

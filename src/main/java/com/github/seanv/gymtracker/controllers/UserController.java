@@ -3,6 +3,7 @@ package com.github.seanv.gymtracker.controllers;
 import com.github.seanv.gymtracker.dto.ProgramDto;
 import com.github.seanv.gymtracker.dto.ProgramsResponse;
 import com.github.seanv.gymtracker.dto.UserDto;
+import com.github.seanv.gymtracker.dto.update.UserUpdateDto;
 import com.github.seanv.gymtracker.entities.User;
 import com.github.seanv.gymtracker.exception.model.ApiError;
 import com.github.seanv.gymtracker.services.ProgramService;
@@ -14,6 +15,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -35,9 +37,9 @@ public class UserController {
     }
 
     @Operation(description = "Update profile")
-    @PatchMapping("/{id}")
-    public ResponseEntity<UserDto> updateProfile(@RequestBody UserDto dto, @PathVariable String id){
-        return null;
+    @PatchMapping()
+    public ResponseEntity<UserDto> updateProfile(@RequestBody UserUpdateDto dto){
+        return ResponseEntity.status(HttpStatus.OK).body(userService.updateUser(dto));
     }
 
     @Operation(description = "Delete profile")
