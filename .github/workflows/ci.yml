@@ -1,4 +1,25 @@
-name: ci.yml
+name: CI
+
 on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
 
 jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'          # matches pom.xml
+          cache: 'maven'               # speeds up later runs
+
+      - name: Build and run tests
+        run: mvn -B verify
