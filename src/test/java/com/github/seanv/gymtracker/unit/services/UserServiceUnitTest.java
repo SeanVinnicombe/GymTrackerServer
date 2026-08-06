@@ -41,6 +41,7 @@ public class UserServiceUnitTest {
     @Test
     void when_updating_user_then_return_updated_user() {
 
+
         User user = UserBuilder.aUser().build();
 
         UserUpdateDto inputDto = UserUpdateDtoBuilder.aUserUpdateDto().build();
