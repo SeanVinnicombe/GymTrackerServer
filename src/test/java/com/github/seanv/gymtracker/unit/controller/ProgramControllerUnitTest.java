@@ -3,12 +3,16 @@ package com.github.seanv.gymtracker.unit.controller;
 import com.github.seanv.gymtracker.controllers.ProgramController;
 import com.github.seanv.gymtracker.dto.ProgramDto;
 import com.github.seanv.gymtracker.entities.Program;
+import com.github.seanv.gymtracker.security.*;
 import com.github.seanv.gymtracker.services.ProgramService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.security.autoconfigure.UserDetailsServiceAutoConfiguration;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.security.core.parameters.P;
+import org.springframework.security.web.AuthenticationEntryPoint;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -22,6 +26,7 @@ import static org.mockito.Mockito.when;
 
 @WebMvcTest(ProgramController.class)
 @AutoConfigureMockMvc(addFilters = false)
+@ActiveProfiles("dev")
 public class ProgramControllerUnitTest {
 
     @Autowired
@@ -29,6 +34,22 @@ public class ProgramControllerUnitTest {
 
     @MockitoBean
     private ProgramService programService;
+
+    @MockitoBean
+    private JwtService jwtService;
+
+    @MockitoBean
+    private SecurityService securityService;
+
+    @MockitoBean
+    private AuthenticationEntryPoint authenticationEntryPoint;
+
+    @MockitoBean
+    private CustomAccessDeniedHandler customAccessDeniedHandler;
+
+    @MockitoBean
+    private JwtAuthFilter jwtAuthFilter;
+
 
     @Test
     void when_getting_program_by_id_then_return_program_dto() throws Exception {
