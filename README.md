@@ -5,7 +5,7 @@ A gym tracking app that allows users to create and log workouts for gym progress
 
 ## Project Status
 
-This is currently an MVP (40-45 hours currently) to first focus on building correct structures and validating endpoints to ensure the flow of data 
+This is currently an MVP (~ 60 hours currently) to first focus on building correct structures and validating endpoints to ensure the flow of data 
 is working correctly and the setup of the project was done correctly and according to industry standard before moving onto
 more production ready features and implementations.
 
@@ -25,6 +25,8 @@ more production ready features and implementations.
 - Open API documentation
 - MapStruct
 - JUnit + MockMvc
+- Docker
+- Kafka
 
 ## What's implemented
 
@@ -35,10 +37,10 @@ more production ready features and implementations.
 - Test Builders for testing
 - Spring Security with JWT
 - Containerization
-
+- Source control
+- CI
 
 ## To Still be implemented
-- Kafka
 - Kubernetes
 - Cloud Deployment
 - More robust Integration tests
@@ -52,9 +54,11 @@ more production ready features and implementations.
 - Improved global exception handling for security exceptions
 - Introduced profiles for development and production environments
 - Added Flyway for DB migrations
-- Introduction of containerization via Docker
+- Introduction of containerization via Docker for deployment
 - Health checks via Actuator when starting up containers
-
+- Setup version control with CI
+- Environment profiles
+- Testing using containers
 
 ## Next milestones
 - Improve test depth
